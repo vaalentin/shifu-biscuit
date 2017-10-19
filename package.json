@@ -1,0 +1,36 @@
+{
+  "name": "shifu-biscuit",
+  "scripts": {
+    "start": "webpack-dev-server --config ./webpack.dev.config.js",
+    "clean": "rm -rf dist",
+    "build": "npm run clean && webpack --config ./webpack.prod.config.js --progress",
+    "format": "prettier --single-quote --no-semi --write \"**/*.{js,ts,css,json}\""
+  },
+  "repository": {
+    "type": "git",
+    "url": "git+https://github.com/vaalentin/shifu-biscuit.git"
+  },
+  "author": "Vaalentin <vaalentin@protonmail.om>",
+  "license": "ISC",
+  "bugs": {
+    "url": "https://github.com/vaalentin/shifu-biscuit/issues"
+  },
+  "homepage": "https://github.com/vaalentin/shifu-biscuit#readme",
+  "devDependencies": {
+    "@types/three": "^0.84.27",
+    "autoprefixer": "^7.1.5",
+    "css-loader": "^0.28.7",
+    "extract-text-webpack-plugin": "^3.0.1",
+    "html-webpack-plugin": "^2.30.1",
+    "postcss-loader": "^2.0.8",
+    "prettier": "^1.7.4",
+    "style-loader": "^0.19.0",
+    "ts-loader": "^3.0.3",
+    "typescript": "^2.5.3",
+    "webpack": "^3.8.1",
+    "webpack-dev-server": "^2.9.2"
+  },
+  "dependencies": {
+    "three": "^0.87.1"
+  }
+}
