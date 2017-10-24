@@ -42,7 +42,8 @@ module.exports = {
             }
           }
         ]
-      }
+      },
+      { test: /\.(json)$/, use: 'file-loader' }
     ]
   },
   plugins: [
