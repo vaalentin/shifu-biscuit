@@ -126,20 +126,28 @@ class App {
       this._shakeCamera(5)
 
       this._biscuit.bounce(point)
+
+      this._hitCount++
     } else if (this._hitCount < 4) {
       this._shakeCamera(5)
 
       piece = this._biscuit.getPieceFromObject(object)
+
+      if (!piece || !piece.active) {
+        this._hitCount++
+      }
     } else {
       this._shakeCamera(10)
 
       piece = this._biscuit.getPieceFromObject(object)
 
-      this._biscuit.explode(
-        this._world,
-        this._preRendering.scene,
-        this._raycaster
-      )
+      if (!piece || !piece.active) {
+        this._biscuit.explode(
+          this._world,
+          this._preRendering.scene,
+          this._raycaster
+        )
+      }
     }
 
     if (piece) {
@@ -154,8 +162,6 @@ class App {
         )
       }
     }
-
-    this._hitCount++
   }
 
   private _update() {
