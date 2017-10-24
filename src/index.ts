@@ -164,34 +164,6 @@ class App {
     }
   }
 
-  private _update() {
-    window.requestAnimationFrame(this._update)
-
-    const delta = this._clock.getDelta()
-
-    this._confettis.update(delta)
-
-    this._world.step(1 / 60, delta, 3)
-
-    this._biscuit.update()
-
-    this._render()
-  }
-
-  private _render() {
-    if (this._blurAmmount === 0) {
-      // forward rendering
-      this._preRendering.render(this._renderer)
-    } else {
-      // post process
-      this._preRendering.render(
-        this._renderer,
-        this._postRendering.renderTargets[0]
-      )
-      this._postRendering.render(this._renderer, this._blurAmmount)
-    }
-  }
-
   private _shakeCamera(steps: number) {
     const timeline = new TimelineMax()
 
@@ -210,6 +182,34 @@ class App {
       this._preRendering.camera.rotation.y = rotation.y
       this._blurAmmount = 0
     })
+  }
+
+  private _update() {
+    window.requestAnimationFrame(this._update)
+
+    const delta = this._clock.getDelta()
+
+    this._world.step(1 / 60, delta, 3)
+
+    this._confettis.update(delta)
+
+    this._biscuit.update()
+
+    this._render()
+  }
+
+  private _render() {
+    if (this._blurAmmount === 0) {
+      // forward rendering
+      this._preRendering.render(this._renderer)
+    } else {
+      // post process
+      this._preRendering.render(
+        this._renderer,
+        this._postRendering.renderTargets[0]
+      )
+      this._postRendering.render(this._renderer, this._blurAmmount)
+    }
   }
 }
 
