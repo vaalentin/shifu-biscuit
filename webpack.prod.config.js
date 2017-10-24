@@ -43,7 +43,7 @@ module.exports = {
         test: /\.css$/,
         use: extractCss
       },
-      { test: /\.(.json)$/, use: 'file-loader' }
+      { test: /\.(json)$/, use: 'file-loader' }
     ]
   },
   plugins: [
