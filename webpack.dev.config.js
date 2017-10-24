@@ -3,6 +3,20 @@ const webpack = require('webpack')
 const HtmlWebpackPlugin = require('html-webpack-plugin')
 const autoprefixer = require('autoprefixer')
 
+const postCss = {
+  loader: 'postcss-loader',
+  options: {
+    plugins: () => [
+      autoprefixer(
+        '> 1%',
+        'last 4 versions',
+        'Firefox ESR',
+        'not ie < 9'
+      )
+    ]
+  }
+}
+
 module.exports = {
   entry: path.resolve(__dirname, './src/index.ts'),
   output: {
@@ -16,7 +30,20 @@ module.exports = {
     rules: [
       { test: /\.tsx?$/, use: 'ts-loader' },
       {
+        test: /\.inline.css$/,
+        use: [
+          {
+            loader: 'css-loader',
+            options: {
+              importLoaders: 1
+            }
+          },
+          postCss
+        ]
+      },
+      {
         test: /\.css$/,
+        exclude: /\.inline.css$/,
         use: [
           { loader: 'style-loader' },
           {
@@ -28,19 +55,7 @@ module.exports = {
               localIdentName: '[local]_[hash:base64:5]'
             }
           },
-          {
-            loader: 'postcss-loader',
-            options: {
-              plugins: () => [
-                autoprefixer(
-                  '> 1%',
-                  'last 4 versions',
-                  'Firefox ESR',
-                  'not ie < 9'
-                )
-              ]
-            }
-          }
+          postCss
         ]
       },
       { test: /\.(json)$/, use: 'file-loader' }

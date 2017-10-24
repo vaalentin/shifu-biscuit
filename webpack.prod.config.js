@@ -4,6 +4,15 @@ const HtmlWebpackPlugin = require('html-webpack-plugin')
 const ExtractTextPlugin = require('extract-text-webpack-plugin')
 const autoprefixer = require('autoprefixer')
 
+const postCss =  {
+  loader: 'postcss-loader',
+  options: {
+    plugins: () => [
+      autoprefixer('> 1%', 'last 4 versions', 'Firefox ESR', 'not ie < 9')
+    ]
+  }
+}
+
 const extractCss = ExtractTextPlugin.extract({
   fallback: 'style-loader',
   use: [
@@ -15,14 +24,7 @@ const extractCss = ExtractTextPlugin.extract({
         localIdentName: '[local]_[hash:base64:5]'
       }
     },
-    {
-      loader: 'postcss-loader',
-      options: {
-        plugins: () => [
-          autoprefixer('> 1%', 'last 4 versions', 'Firefox ESR', 'not ie < 9')
-        ]
-      }
-    }
+    postCss
   ]
 })
 
@@ -40,7 +42,20 @@ module.exports = {
     rules: [
       { test: /\.ts$/, use: 'ts-loader' },
       {
+        test: /\.inline.css$/,
+        use: [
+          {
+            loader: 'css-loader',
+            options: {
+              importLoaders: 1
+            }
+          },
+          postCss
+        ]
+      },
+      {
         test: /\.css$/,
+        exclude: /\.inline.css$/,
         use: extractCss
       },
       { test: /\.(json)$/, use: 'file-loader' }
