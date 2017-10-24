@@ -40,7 +40,7 @@ export default class Floor {
   public body: CANNON.Body
 
   constructor() {
-    const geometry = new THREE.PlaneBufferGeometry(3, 3)
+    const geometry = new THREE.PlaneBufferGeometry(10, 10)
 
     geometry.addAttribute(
       'color',
