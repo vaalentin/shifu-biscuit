@@ -165,10 +165,17 @@ class App {
     }
   }
 
-  private _shakeCamera(steps: number) {
-    const timeline = new TimelineMax()
+  private _shakeCamera(steps: number = 20) {
+    const timeline = new TimelineMax({
+      onComplete: () => {
+        this._preRendering.camera.lookAt(new THREE.Vector3(0, 0, 0))
+        
+        this._blurAmmount = 0
+      }
+    })
 
     const rotation = this._preRendering.camera.rotation.clone()
+
     this._blurAmmount = 2
 
     for (var i = 0; i < steps; i++) {
@@ -177,12 +184,6 @@ class App {
         y: rotation.y + (Math.random() * 2 - 1) * 0.01
       })
     }
-
-    timeline.call(() => {
-      this._preRendering.camera.rotation.z = rotation.z
-      this._preRendering.camera.rotation.y = rotation.y
-      this._blurAmmount = 0
-    })
   }
 
   private _update() {
