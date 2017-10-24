@@ -53,7 +53,7 @@ export default class PostRendering {
         `,
       uniforms: {
         texture: { type: 't', value: null },
-        blurAmmount: { tyype: 'v2', value: new THREE.Vector2(2, 2)},
+        blurAmmount: { tyype: 'v2', value: new THREE.Vector2(2, 2) },
         resolution: { type: 'v2', value: new THREE.Vector2(width, height) }
       },
       depthTest: false
@@ -71,7 +71,7 @@ export default class PostRendering {
       renderTarget.depthBuffer = true
 
       this.renderTargets[i] = renderTarget
-    }    
+    }
 
     this.scene = new THREE.Scene()
     this.camera = new THREE.Camera()
@@ -85,7 +85,7 @@ export default class PostRendering {
     for (let i = 0; i < this.renderTargets.length; ++i) {
       this.renderTargets[i].setSize(width, height)
     }
-    
+
     this.material.uniforms.resolution.value.set(width, height)
   }
 

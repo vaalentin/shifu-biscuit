@@ -54,6 +54,9 @@ export default class Paper {
     this.el.applyMatrix(new THREE.Matrix4().makeRotationX(-Math.PI / 2))
 
     const gui = new GUI()
-    gui.add(material.uniforms.progress, 'value').min(0).max(100)
+    gui
+      .add(material.uniforms.progress, 'value')
+      .min(0)
+      .max(100)
   }
 }

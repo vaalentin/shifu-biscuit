@@ -51,7 +51,11 @@ export default class Shadow {
 
   private _planeVector: THREE.Vector3
 
-  constructor(el: THREE.Object3D, size = 1, planeVector = new THREE.Vector3(0, -1, 0)) {
+  constructor(
+    el: THREE.Object3D,
+    size = 1,
+    planeVector = new THREE.Vector3(0, -1, 0)
+  ) {
     this._el = el
 
     this._planeVector = planeVector
@@ -82,7 +86,7 @@ export default class Shadow {
     this.el.geometry.dispose()
 
     const material = this.el.material as any
-    
+
     material.dispose()
 
     this.el = null

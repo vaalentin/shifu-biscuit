@@ -79,7 +79,9 @@ export default class Confettis {
     ]
 
     for (let i = 0; i < colors.length; i += 3) {
-      const [r, g, b] = particlesColors[Math.floor(Math.random() * particlesColors.length)]
+      const [r, g, b] = particlesColors[
+        Math.floor(Math.random() * particlesColors.length)
+      ]
 
       colors[i] = r
       colors[i + 1] = g
@@ -92,15 +94,9 @@ export default class Confettis {
       scales[i] = Math.random() * 50
     }
 
-    this._positions = new THREE.BufferAttribute(
-      positions,
-      3
-    )
+    this._positions = new THREE.BufferAttribute(positions, 3)
 
-    this._lifeSpans = new THREE.BufferAttribute(
-      lifeSpans,
-      1
-    )
+    this._lifeSpans = new THREE.BufferAttribute(lifeSpans, 1)
 
     const geometry = new THREE.BufferGeometry()
 
@@ -156,9 +152,18 @@ export default class Confettis {
       this._acceleration[i + 1] -= 0.2
 
       // verlet
-      const x = positions[i] + (positions[i] - this._previousPositions[i]) + this._acceleration[i] * delta * delta
-      const y = positions[i + 1] + (positions[i + 1] - this._previousPositions[i + 1]) + this._acceleration[i + 1] * delta * delta
-      const z = positions[i + 2] + (positions[i + 2] - this._previousPositions[i + 2]) + this._acceleration[i + 2] * delta * delta
+      const x =
+        positions[i] +
+        (positions[i] - this._previousPositions[i]) +
+        this._acceleration[i] * delta * delta
+      const y =
+        positions[i + 1] +
+        (positions[i + 1] - this._previousPositions[i + 1]) +
+        this._acceleration[i + 1] * delta * delta
+      const z =
+        positions[i + 2] +
+        (positions[i + 2] - this._previousPositions[i + 2]) +
+        this._acceleration[i + 2] * delta * delta
 
       this._previousPositions[i] = positions[i]
       this._previousPositions[i + 1] = positions[i + 1]

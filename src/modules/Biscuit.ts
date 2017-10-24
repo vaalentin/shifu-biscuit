@@ -40,14 +40,14 @@ export default class Biscuit {
     this.pieces = []
 
     GET(require<string>('../models/biscuit.json'), response => {
-        const { pieces } = JSON.parse(response)
+      const { pieces } = JSON.parse(response)
 
-        for (let i = 0; i < pieces.length; ++i) {
-          const piece = new BiscuitPiece(pieces[i])
-          this.el.add(piece.el)
-          this.body.addShape(piece.boxShape, piece.boxShapeCenter)
-          this.pieces.push(piece)
-        }
+      for (let i = 0; i < pieces.length; ++i) {
+        const piece = new BiscuitPiece(pieces[i])
+        this.el.add(piece.el)
+        this.body.addShape(piece.boxShape, piece.boxShapeCenter)
+        this.pieces.push(piece)
+      }
     })
 
     this.active = true
@@ -56,11 +56,11 @@ export default class Biscuit {
   public update() {
     if (this.active) {
       this.shadow.update()
-      
+
       const { position, quaternion } = this.body
-  
+
       this.el.position.set(position.x, position.y, position.z)
-  
+
       this.el.quaternion.set(
         quaternion.x,
         quaternion.y,
@@ -86,21 +86,22 @@ export default class Biscuit {
     return null
   }
 
-  public removePiece(piece: BiscuitPiece, world: CANNON.World, scene: THREE.Scene, raycaster: Raycaster) {
+  public removePiece(
+    piece: BiscuitPiece,
+    world: CANNON.World,
+    scene: THREE.Scene,
+    raycaster: Raycaster
+  ) {
     if (piece.active) {
       return
     }
 
     const worldPosition = piece.el.getWorldPosition()
-    
+
     this.el.remove(piece.el)
     scene.add(piece.el)
 
-    piece.body.position.set(
-      worldPosition.x,
-      worldPosition.y,
-      worldPosition.z
-    )
+    piece.body.position.set(worldPosition.x, worldPosition.y, worldPosition.z)
 
     world.addBody(piece.body)
     scene.add(piece.shadow.el)
@@ -112,26 +113,22 @@ export default class Biscuit {
   public bouncePiece(piece: BiscuitPiece, point: THREE.Vector3) {
     piece.body.applyForce(
       new CANNON.Vec3(0, 500, 0),
-      new CANNON.Vec3(
-        point.x,
-        point.y,
-        point.z
-      )
+      new CANNON.Vec3(point.x, point.y, point.z)
     )
   }
 
   public bounce(point: THREE.Vector3) {
     this.body.applyForce(
       new CANNON.Vec3(0, 100, 0),
-      new CANNON.Vec3(
-        point.x,
-        point.y,
-        point.z
-      )
+      new CANNON.Vec3(point.x, point.y, point.z)
     )
   }
 
-  public explode(world: CANNON.World, scene: THREE.Scene, raycaster: Raycaster) {
+  public explode(
+    world: CANNON.World,
+    scene: THREE.Scene,
+    raycaster: Raycaster
+  ) {
     if (!this.active) {
       return
     }

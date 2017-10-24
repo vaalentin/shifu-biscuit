@@ -41,24 +41,29 @@ export default class Floor {
 
   constructor() {
     const geometry = new THREE.PlaneBufferGeometry(3, 3)
-    
+
     geometry.addAttribute(
       'color',
       new THREE.BufferAttribute(
         new Float32Array([
-          0.5, 0.5, 1.0,
-          0.5, 0.5, 1.0,
-          0.5, 0.5, 1.0,
-          0.5, 0.5, 1.0,
+          0.5,
+          0.5,
+          1.0,
+          0.5,
+          0.5,
+          1.0,
+          0.5,
+          0.5,
+          1.0,
+          0.5,
+          0.5,
+          1.0
         ]),
         3
       )
     )
 
-    this.el = new THREE.Mesh(
-      geometry,
-      Floor._material
-    )
+    this.el = new THREE.Mesh(geometry, Floor._material)
 
     this.el.quaternion.setFromAxisAngle(
       new THREE.Vector3(1, 0, 0),
@@ -66,11 +71,11 @@ export default class Floor {
     )
 
     this.body = new CANNON.Body({ mass: 0 })
-    
+
     const shape = new CANNON.Plane()
-    
+
     this.body.addShape(shape)
-    
+
     this.body.quaternion.setFromAxisAngle(
       new CANNON.Vec3(1, 0, 0),
       -Math.PI / 2

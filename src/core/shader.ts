@@ -7,4 +7,3 @@ export const vertexShaderPrecision = Features.supportsVsHighp
 export const fragmentShaderPrecision = Features.supportsFsHighp
   ? 'highp'
   : 'mediump'
-  

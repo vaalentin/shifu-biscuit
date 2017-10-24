@@ -126,26 +126,32 @@ class App {
       this._shakeCamera(5)
 
       this._biscuit.bounce(point)
-    }
-    else if (this._hitCount < 4) {
+    } else if (this._hitCount < 4) {
       this._shakeCamera(5)
 
       piece = this._biscuit.getPieceFromObject(object)
-    }
-    else  {
+    } else {
       this._shakeCamera(10)
 
       piece = this._biscuit.getPieceFromObject(object)
-      
-      this._biscuit.explode(this._world, this._preRendering.scene, this._raycaster)
+
+      this._biscuit.explode(
+        this._world,
+        this._preRendering.scene,
+        this._raycaster
+      )
     }
 
     if (piece) {
       if (piece.active) {
         this._biscuit.bouncePiece(piece, point)
-      }
-      else {
-        this._biscuit.removePiece(piece, this._world, this._preRendering.scene, this._raycaster)
+      } else {
+        this._biscuit.removePiece(
+          piece,
+          this._world,
+          this._preRendering.scene,
+          this._raycaster
+        )
       }
     }
 
@@ -169,11 +175,13 @@ class App {
   private _render() {
     if (this._blurAmmount === 0) {
       // forward rendering
-      this._preRendering.render(this._renderer) 
-    }
-    else {
+      this._preRendering.render(this._renderer)
+    } else {
       // post process
-      this._preRendering.render(this._renderer, this._postRendering.renderTargets[0]);
+      this._preRendering.render(
+        this._renderer,
+        this._postRendering.renderTargets[0]
+      )
       this._postRendering.render(this._renderer, this._blurAmmount)
     }
   }
@@ -184,7 +192,7 @@ class App {
     const rotation = this._preRendering.camera.rotation.clone()
     this._blurAmmount = 2
 
-    for(var i = 0; i < steps; i++) {
+    for (var i = 0; i < steps; i++) {
       timeline.to(this._preRendering.camera.rotation, Math.random() * 0.05, {
         z: rotation.z + (Math.random() * 2 - 1) * 0.1,
         y: rotation.y + (Math.random() * 2 - 1) * 0.01

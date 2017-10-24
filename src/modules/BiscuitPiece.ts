@@ -15,7 +15,7 @@ interface BufferData {
 
 interface BiscuitPieceData {
   id: string
-  position: { x: number, y: number, z: number }
+  position: { x: number; y: number; z: number }
   shadowSize: number
   attributes: {
     position: BufferData
@@ -144,11 +144,7 @@ export default class BiscuitPiece {
 
     const { position, quaternion } = this.body
 
-    this.el.position.set(
-      position.x,
-      position.y,
-      position.z
-    )
+    this.el.position.set(position.x, position.y, position.z)
 
     this.el.quaternion.set(
       quaternion.x,
