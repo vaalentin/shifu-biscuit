@@ -1,9 +1,10 @@
 import * as THREE from 'three'
 
 import { vertexShaderPrecision, fragmentShaderPrecision } from '../core/shader'
+import { map } from '../core/math'
 
 export default class Confettis {
-  private static _material = new THREE.RawShaderMaterial({
+  private static _confettiMaterial = new THREE.RawShaderMaterial({
     vertexShader: `
     precision ${vertexShaderPrecision} float;
 
@@ -41,103 +42,182 @@ export default class Confettis {
     }
     `,
     transparent: true,
-    depthWrite: false,
-    depthTest: false
+    depthWrite: false
   })
 
-  public el: THREE.Points
+  private static _shadowMaterial = new THREE.RawShaderMaterial({
+    vertexShader: `
+    precision ${vertexShaderPrecision} float;
 
-  private _positions: THREE.BufferAttribute
-  private _lifeSpans: THREE.BufferAttribute
+    attribute vec3 position;
+    attribute float influence;
+    attribute float lifeSpan;
+    attribute float scale;
 
-  private _acceleration: Float32Array
-  private _previousPositions: Float32Array
+    uniform mat4 projectionMatrix;
+    uniform mat4 modelViewMatrix;
+
+    varying float vInfluence;
+
+    void main() {
+      vInfluence = influence;
+
+      gl_PointSize = (scale * 2.0) * lifeSpan;
+      gl_Position = projectionMatrix * modelViewMatrix * vec4(position, 1.0);
+    }
+    `,
+    fragmentShader: `                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                            
+    precision ${fragmentShaderPrecision} float;
+
+    varying float vInfluence;
+
+    void main() {
+      vec2 coord = gl_PointCoord - vec2(0.5);
+      float distance = length(coord);
+
+      float alpha = smoothstep(0.5, 0.0, distance);
+
+      gl_FragColor = vec4(vec3(0.0), alpha * vInfluence * 0.1);
+    }
+    `,
+    transparent: true,
+    depthWrite: false,
+    depthTest: true
+  })
+
+  private static _confettisColors = [
+    [233 / 255, 209 / 255, 178 / 255],
+    [151 / 255, 102 / 255, 41 / 255],
+    [208 / 255, 151 / 255, 77 / 255],
+    [1, 0.5, 0],
+    [0, 1, 0.5],
+    [1, 0, 0.5]
+  ]
+
+  public confettis: THREE.Points
+
+  public shadows: THREE.Points
+
+  private _confettisPositions: THREE.BufferAttribute
+  private _confettisLifeSpans: THREE.BufferAttribute
+
+  private _confettisAccelerations: Float32Array
+  private _confettisPreviousPositions: Float32Array
+  private _confettisScales: Float32Array
+
+  private _shadowsPositions: THREE.BufferAttribute
+  private _shadowsInfluences: THREE.BufferAttribute
 
   public active: boolean
 
   constructor(count = 100) {
-    const positions = new Float32Array(count * 3)
+    // confettis arrays
+    const confettisPositions = new Float32Array(count * 3)
+    const confettisLifeSpans = new Float32Array(count)
+    const confettisColors = new Float32Array(count * 3)
+    this._confettisScales = new Float32Array(count)
+    this._confettisAccelerations = new Float32Array(count * 3)
+    this._confettisPreviousPositions = new Float32Array(count * 3)
 
-    for (let i = 0; i < positions.length; ++i) {
-      positions[i] = 0
-    }
+    for (let i = 0, j = 0; i < count * 3; i += 3, j++) {
+      confettisPositions[i] = 0
+      confettisPositions[i + 1] = 0
+      confettisPositions[i + 2] = 0
 
-    const lifeSpans = new Float32Array(count)
+      confettisLifeSpans[j] = 0
 
-    for (let i = 0; i < lifeSpans.length; ++i) {
-      lifeSpans[i] = 0
-    }
-
-    const colors = new Float32Array(count * 3)
-
-    const particlesColors = [
-      [233 / 255, 209 / 255, 178 / 255],
-      [151 / 255, 102 / 255, 41 / 255],
-      [208 / 255, 151 / 255, 77 / 255],
-      [1, 0.5, 0],
-      [0, 1, 0.5],
-      [1, 0, 0.5]
-    ]
-
-    for (let i = 0; i < colors.length; i += 3) {
-      const [r, g, b] = particlesColors[
-        Math.floor(Math.random() * particlesColors.length)
+      const [r, g, b] = Confettis._confettisColors[
+        Math.floor(Math.random() * Confettis._confettisColors.length)
       ]
 
-      colors[i] = r
-      colors[i + 1] = g
-      colors[i + 2] = b
+      confettisColors[i] = r
+      confettisColors[i + 1] = g
+      confettisColors[i + 2] = b
+
+      this._confettisScales[j] = Math.random() * 50
+
+      this._confettisAccelerations[i] = 0
+      this._confettisAccelerations[i + 1] = 0
+      this._confettisAccelerations[i + 2] = 0
+
+      this._confettisPreviousPositions[i] = 0
+      this._confettisPreviousPositions[i + 1] = 0
+      this._confettisPreviousPositions[i + 2] = 0
     }
 
-    const scales = new Float32Array(count)
+    // confettis attributes
+    this._confettisPositions = new THREE.BufferAttribute(confettisPositions, 3)
+    this._confettisLifeSpans = new THREE.BufferAttribute(confettisLifeSpans, 1)
 
-    for (let i = 0; i < scales.length; i++) {
-      scales[i] = Math.random() * 50
+    // confettis geometry
+    const confettisGeometry = new THREE.BufferGeometry()
+
+    confettisGeometry.addAttribute('position', this._confettisPositions)
+    confettisGeometry.addAttribute('lifeSpan', this._confettisLifeSpans)
+    confettisGeometry.addAttribute('color', new THREE.BufferAttribute(confettisColors, 3))
+    confettisGeometry.addAttribute('scale', new THREE.BufferAttribute(this._confettisScales, 1))
+
+    // confettis
+    this.confettis = new THREE.Points(confettisGeometry, Confettis._confettiMaterial)
+    this.confettis.visible = false
+
+    // shadows arrays
+    const shadowsPositions = new Float32Array(count * 3)
+    const shadowsInfluences = new Float32Array(count)
+
+    for (let i = 0, j = 0; i < count * 3; i += 3, j++) {
+      shadowsPositions[i] = 0
+      shadowsPositions[i + 1] = 0
+      shadowsPositions[i + 2] = 0
+
+      shadowsInfluences[j] = 0
     }
 
-    this._positions = new THREE.BufferAttribute(positions, 3)
+    // shadows attributes
+    this._shadowsPositions = new THREE.BufferAttribute(shadowsPositions, 3)
+    this._shadowsInfluences = new THREE.BufferAttribute(shadowsInfluences, 1)
 
-    this._lifeSpans = new THREE.BufferAttribute(lifeSpans, 1)
+    // shadows geometry
+    const shadowsGeometry = new THREE.BufferGeometry()
 
-    const geometry = new THREE.BufferGeometry()
+    shadowsGeometry.addAttribute('position', this._shadowsPositions)
+    shadowsGeometry.addAttribute('influence', this._shadowsInfluences)
+    shadowsGeometry.addAttribute('lifeSpan', this._confettisLifeSpans)
+    shadowsGeometry.addAttribute('scale', (confettisGeometry.attributes as any).scale)
 
-    geometry.addAttribute('position', this._positions)
-    geometry.addAttribute('lifeSpan', this._lifeSpans)
-    geometry.addAttribute('color', new THREE.BufferAttribute(colors, 3))
-    geometry.addAttribute('scale', new THREE.BufferAttribute(scales, 1))
-
-    this._acceleration = new Float32Array(count * 3)
-    this._previousPositions = new Float32Array(count * 3)
-
-    this.el = new THREE.Points(geometry, Confettis._material)
+    // shadows
+    this.shadows = new THREE.Points(shadowsGeometry, Confettis._shadowMaterial)
+    this.shadows.visible = false
 
     this.active = false
   }
 
   public explode(origin: THREE.Vector3) {
     this.active = true
+    this.confettis.visible = true
+    this.shadows.visible = true
 
-    const positions = this._positions.array as number[]
-    const lifespans = this._lifeSpans.array as number[]
+    const confettisPositions = this._confettisPositions.array as number[]
+    const confettisLifeSpans = this._confettisLifeSpans.array as number[]
 
-    for (let i = 0, j = 0; i < positions.length; i += 3, j++) {
-      positions[i] = origin.x + (Math.random() * 2 - 1) * 0.1
-      positions[i + 1] = origin.y + (Math.random() * 2 - 1) * 0.1
-      positions[i + 2] = origin.z + (Math.random() * 2 - 1) * 0.1
+    for (let i = 0, j = 0; i < confettisPositions.length; i += 3, j++) {
+      confettisPositions[i] = origin.x + (Math.random() * 2 - 1) * 0.1
+      confettisPositions[i + 1] = origin.y + (Math.random() * 2 - 1) * 0.1
+      confettisPositions[i + 2] = origin.z + (Math.random() * 2 - 1) * 0.1
 
-      this._previousPositions[i] = origin.x
-      this._previousPositions[i + 1] = origin.y
-      this._previousPositions[i + 2] = origin.z
+      this._confettisPreviousPositions[i] = origin.x
+      this._confettisPreviousPositions[i + 1] = origin.y
+      this._confettisPreviousPositions[i + 2] = origin.z
 
-      this._acceleration[i] = (Math.random() * 2 - 1) * 1
-      this._acceleration[i + 1] = (Math.random() * 2 - 1) * 0.5
-      this._acceleration[i + 2] = (Math.random() * 2 - 1) * 0.5
+      this._confettisAccelerations[i] = (Math.random() * 2 - 1) * 1
+      this._confettisAccelerations[i + 1] = (Math.random() * 2 - 1) * 0.5
+      this._confettisAccelerations[i + 2] = (Math.random() * 2 - 1) * 0.5
 
-      lifespans[j] = 1
+      confettisLifeSpans[j] = 1
     }
 
-    this._positions.needsUpdate = true
-    this._lifeSpans.needsUpdate = true
+    this._confettisPositions.needsUpdate = true
+    this._confettisLifeSpans.needsUpdate = true
   }
 
   public update(delta: number) {
@@ -145,47 +225,70 @@ export default class Confettis {
       return
     }
 
-    const positions = this._positions.array as number[]
-    const lifespans = this._lifeSpans.array as number[]
+    const confettisPositions = this._confettisPositions.array as number[]
+    const confettisLifeSpans = this._confettisLifeSpans.array as number[]
 
-    for (let i = 0, j = 0; i < positions.length; i += 3, j++) {
+    const shadowsPositions = this._shadowsPositions.array as number[]
+    const shadowsInfluences = this._shadowsInfluences.array as number[]
+
+    for (let i = 0, j = 0; i < confettisPositions.length; i += 3, j++) {
       // gravity
-      this._acceleration[i + 1] -= 0.2
+      this._confettisAccelerations[i + 1] -= 0.2
+      // this._acceleration[i + 1] = Math.min(this._acceleration[i + 1], -1)
 
       // verlet
       const x =
-        positions[i] +
-        (positions[i] - this._previousPositions[i]) +
-        this._acceleration[i] * delta * delta
+        confettisPositions[i] +
+        (confettisPositions[i] - this._confettisPreviousPositions[i]) +
+        this._confettisAccelerations[i] * delta * delta
 
       let y =
-        positions[i + 1] +
-        (positions[i + 1] - this._previousPositions[i + 1]) +
-        this._acceleration[i + 1] * delta * delta
-
-      y = Math.max(y, 0)
+        confettisPositions[i + 1] +
+        (confettisPositions[i + 1] - this._confettisPreviousPositions[i + 1]) +
+        this._confettisAccelerations[i + 1] * delta * delta
 
       const z =
-        positions[i + 2] +
-        (positions[i + 2] - this._previousPositions[i + 2]) +
-        this._acceleration[i + 2] * delta * delta
+        confettisPositions[i + 2] +
+        (confettisPositions[i + 2] - this._confettisPreviousPositions[i + 2]) +
+        this._confettisAccelerations[i + 2] * delta * delta
 
-      this._previousPositions[i] = positions[i]
-      this._previousPositions[i + 1] = positions[i + 1]
-      this._previousPositions[i + 2] = positions[i + 2]
+      this._confettisPreviousPositions[i] = confettisPositions[i]
+      this._confettisPreviousPositions[i + 1] = confettisPositions[i + 1]
+      this._confettisPreviousPositions[i + 2] = confettisPositions[i + 2]
 
-      positions[i] = x
-      positions[i + 1] = y
-      positions[i + 2] = z
+      // check collisions with the floor and inverse velocity
+      // note that the radius is only an approximation
+      // TODO test on different devices
+      const radius = (this._confettisScales[j] * 0.01) * confettisLifeSpans[j]
 
-      lifespans[j] -= 0.8 * delta
+      if (y < radius / 2) {
+        y = 2 * radius - y
+        this._confettisPreviousPositions[i + 1] = 2 * radius - this._confettisPreviousPositions[i + 1]
+      }
 
-      if (lifespans[j] <= 0) {
+      confettisPositions[i] = x
+      confettisPositions[i + 1] = y
+      confettisPositions[i + 2] = z
+
+      shadowsPositions[i] = x
+      shadowsPositions[i + 1] = 0
+      shadowsPositions[i + 2] = z
+
+      shadowsInfluences[j] = map(y, 0.0, 2, 1.0, 0.2)
+
+      confettisLifeSpans[j] -= 0.8 * delta
+
+      if (confettisLifeSpans[j] <= 0) {
         this.active = false
+        this.confettis.visible = false
+        this.shadows.visible = false
       }
     }
 
-    this._positions.needsUpdate = true
-    this._lifeSpans.needsUpdate = true
+    this._confettisPositions.needsUpdate = true
+    this._confettisLifeSpans.needsUpdate = true
+
+    this._shadowsPositions.needsUpdate = true
+    this._shadowsInfluences.needsUpdate = true
   }
 }
