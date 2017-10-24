@@ -70,7 +70,7 @@ class App {
     this._paper = new Paper()
     // this._preRendering.scene.add(this._paper.el)
 
-    this._confettis = new Confettis()
+    this._confettis = new Confettis(300)
     this._preRendering.scene.add(this._confettis.el)
 
     this._world.addBody(this._biscuit.body)
