@@ -41,7 +41,8 @@ export default class Confettis {
     }
     `,
     transparent: true,
-    depthWrite: false
+    depthWrite: false,
+    depthTest: false
   })
 
   public el: THREE.Points
@@ -156,10 +157,14 @@ export default class Confettis {
         positions[i] +
         (positions[i] - this._previousPositions[i]) +
         this._acceleration[i] * delta * delta
-      const y =
+
+      let y =
         positions[i + 1] +
         (positions[i + 1] - this._previousPositions[i + 1]) +
         this._acceleration[i + 1] * delta * delta
+
+      y = Math.max(y, 0)
+
       const z =
         positions[i + 2] +
         (positions[i + 2] - this._previousPositions[i + 2]) +
