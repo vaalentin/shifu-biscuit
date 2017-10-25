@@ -31,7 +31,6 @@ export default class BiscuitPiece {
     precision ${vertexShaderPrecision} float;
 
     attribute vec3 position;
-    attribute vec2 uv;
     attribute vec3 color;
 
     uniform mat4 projectionMatrix;
