@@ -58,7 +58,7 @@ module.exports = {
         exclude: /\.inline.css$/,
         use: extractCss
       },
-      { test: /\.(json)$/, use: 'file-loader' }
+      { test: /\.(json|mp3|wav)$/, use: 'file-loader' }
     ]
   },
   plugins: [

@@ -7,6 +7,7 @@ import { TweenMax, TimelineMax } from 'gsap'
 import PreRendering from './core/PreRendering'
 import PostRendering from './core/PostRendering'
 import Raycaster from './core/Raycaster'
+import SoundPlayer from './core/SoundPlayer'
 
 import Floor from './modules/Floor'
 import Biscuit from './modules/Biscuit'
@@ -25,11 +26,14 @@ class App {
 
   private _clock: THREE.Clock
 
+  private _shoutSounds: SoundPlayer[]
+  private _soundIndex: number
+
   private _floor: Floor
   private _biscuit: Biscuit
   private _paper: Paper
   private _confettis: Confettis
-
+  
   private _hitCount: number
 
   private _blurAmmount: number
@@ -58,6 +62,17 @@ class App {
     this._raycaster = new Raycaster(this._renderer.domElement)
 
     this._clock = new THREE.Clock()
+
+    this._shoutSounds = new Array(3)
+    
+    for (let i = 0; i < this._shoutSounds.length; i++) {
+      this._shoutSounds[i] = new SoundPlayer([
+        require<string>('./sounds/shout.mp3'),
+        require<string>('./sounds/shout.wav')
+      ])
+    }
+
+    this._soundIndex = 0
 
     this._floor = new Floor()
     this._preRendering.scene.add(this._floor.el)
@@ -118,6 +133,12 @@ class App {
 
   private _handleRaycast(interestion: THREE.Intersection) {
     const { point, object } = interestion
+
+    
+    
+    this._shoutSounds[this._soundIndex].play()
+
+    this._soundIndex = (this._soundIndex + 1) % this._shoutSounds.length
 
     this._confettis.explode(point)
 

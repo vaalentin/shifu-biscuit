@@ -58,7 +58,7 @@ module.exports = {
           postCss
         ]
       },
-      { test: /\.(json)$/, use: 'file-loader' }
+      { test: /\.(json|mp3|wav)$/, use: 'file-loader' }
     ]
   },
   plugins: [
