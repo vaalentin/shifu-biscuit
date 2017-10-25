@@ -20,7 +20,7 @@ export default class Biscuit {
 
   public active: boolean
 
-  constructor(scene: THREE.Scene, world: CANNON.World) {
+  constructor() {
     this.el = new THREE.Object3D()
     this.el.position.set(0, 2, 0)
 
@@ -39,7 +39,7 @@ export default class Biscuit {
 
     this.pieces = []
 
-    GET(require<string>('../models/biscuit.json'), response => {
+    new THREE.FileLoader().load(require<string>('../models/biscuit.json'), response => {
       const { pieces } = JSON.parse(response)
 
       for (let i = 0; i < pieces.length; ++i) {

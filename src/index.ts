@@ -38,6 +38,8 @@ class App {
 
   private _blurAmmount: number
 
+  private _active: boolean
+
   constructor() {
     this._world = new CANNON.World()
     this._world.gravity.set(0, -9.82, 0)
@@ -78,7 +80,7 @@ class App {
     this._preRendering.scene.add(this._floor.el)
     this._world.addBody(this._floor.body)
 
-    this._biscuit = new Biscuit(this._preRendering.scene, this._world)
+    this._biscuit = new Biscuit()
     this._preRendering.scene.add(this._biscuit.el)
     this._preRendering.scene.add(this._biscuit.shadow.el)
 
@@ -96,6 +98,8 @@ class App {
 
     this._blurAmmount = 0
 
+    this._active = false
+
     this._bindMethods()
     this._addListeners()
 
@@ -107,6 +111,8 @@ class App {
     this._handleResize = this._handleResize.bind(this)
     this._handleMouseDown = this._handleMouseDown.bind(this)
     this._handleRaycast = this._handleRaycast.bind(this)
+    this._handleLoadProgress = this._handleLoadProgress.bind(this)
+    this._handleLoadComplete = this._handleLoadComplete.bind(this)
   }
 
   private _addListeners() {
@@ -116,6 +122,16 @@ class App {
       this._handleMouseDown
     )
     this._raycaster.onCast.add(this._handleRaycast)
+    THREE.DefaultLoadingManager.onProgress = this._handleLoadProgress
+    THREE.DefaultLoadingManager.onLoad = this._handleLoadComplete
+  }
+
+  private _handleLoadProgress(url: number, loaded: number, total: number) {
+    // console.log(progress)
+  }
+
+  private _handleLoadComplete() {
+    this._start()
   }
 
   private _handleResize() {
@@ -186,6 +202,10 @@ class App {
     }
   }
 
+  private _start() {
+    this._active = true
+  }
+
   private _shakeCamera(steps: number = 20) {
     const timeline = new TimelineMax({
       onComplete: () => {
@@ -212,11 +232,13 @@ class App {
 
     const delta = this._clock.getDelta()
 
-    this._world.step(1 / 60, delta, 3)
-
-    this._confettis.update(delta)
-
-    this._biscuit.update()
+    if (this._active) {
+      this._world.step(1 / 60, delta, 3)
+      
+      this._confettis.update(delta)
+    
+      this._biscuit.update()
+    }
 
     this._render()
   }
