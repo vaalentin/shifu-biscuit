@@ -14,6 +14,7 @@ import Biscuit from './modules/Biscuit'
 import BiscuitPiece from './modules/BiscuitPiece'
 import Paper from './modules/Paper'
 import Confettis from './modules/Confettis'
+import Slicer from './modules/Slicer'
 
 class App {
   private _world: CANNON.World
@@ -33,6 +34,7 @@ class App {
   private _biscuit: Biscuit
   private _paper: Paper
   private _confettis: Confettis
+  private _slicer: Slicer
   
   private _hitCount: number
 
@@ -93,6 +95,9 @@ class App {
 
     this._world.addBody(this._biscuit.body)
     this._raycaster.add(this._biscuit.el)
+    this._slicer = new Slicer(this._renderer.domElement)
+    this._preRendering.scene.add(this._slicer.line)
+    this._preRendering.scene.add(this._slicer.mesh)
 
     this._hitCount = 0
 
