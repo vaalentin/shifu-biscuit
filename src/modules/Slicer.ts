@@ -61,7 +61,7 @@ export default class Slicer {
   private _lastPointX: number
   private _lastPointY: number
 
-  private _inputPoints: THREE.Vector3[]
+  private _inputPoints: Float32Array
 
   private _linePositions: THREE.BufferAttribute
   private _meshPositions: THREE.BufferAttribute
@@ -83,10 +83,11 @@ export default class Slicer {
     this._lastPointX = 0
     this._lastPointY = 0
 
-    this._inputPoints = new Array(this._pointsToCapture)
+
+    this._inputPoints = new Float32Array(this._pointsToCapture * 3)
 
     for (let i = 0; i < this._inputPoints.length; i++) {
-      this._inputPoints[i] = new THREE.Vector3(0, 0, 0)
+      this._inputPoints[i] = Slicer._NULL
     }
 
     // line
@@ -178,15 +179,15 @@ export default class Slicer {
     this._lastPointX = x
     this._lastPointY = y
 
-    for (let i = this._inputPoints.length - 1; i > 0; i--) {
-      this._inputPoints[i].copy(this._inputPoints[i - 1]) 
+    for (let i = this._inputPoints.length - 1; i > 0; i -= 3) {
+      this._inputPoints[i] = this._inputPoints[i - 3]
+      this._inputPoints[i - 1] = this._inputPoints[i - 4]
+      this._inputPoints[i - 2] = this._inputPoints[i - 5]
     }
 
-    this._inputPoints[0].set(
-      map(x, 0, this._width, -1, 1),
-      map(y, 0, this._height, 1, -1),
-      0
-    )
+    this._inputPoints[0] = map(x, 0, this._width, -1, 1)
+    this._inputPoints[1] = map(y, 0, this._height, 1, -1)
+    this._inputPoints[2] = 0
 
     this._updateLine()
     this._updateMesh()
@@ -195,50 +196,61 @@ export default class Slicer {
   private _updateLine() {
     const linePositions = this._linePositions.array as number[]
 
-    for (let i = 0, j = 0; i < this._inputPoints.length; i++, j += 3) {
-      linePositions[j] = this._inputPoints[i].x
-      linePositions[j + 1] = this._inputPoints[i].y
-      linePositions[j + 2] = this._inputPoints[i].z
+    for (let i = 0; i < this._inputPoints.length; i += 3) {
+      linePositions[i] = this._inputPoints[i]
+      linePositions[i + 1] = this._inputPoints[i + 1]
+      linePositions[i + 2] = this._inputPoints[i + 2]
     }
 
     this._linePositions.needsUpdate = true    
   }
 
   private _updateMesh() {
-    const points = []
-
-    points.push(this._inputPoints[0])
-
-    for (let i = 1; i < this._inputPoints.length - 1; i++) {
-      const dir = this._inputPoints[i].clone().sub(this._inputPoints[i - 1])
-
-      dir.normalize()
-
-      const perp = new THREE.Vector3(-dir.y, dir.x, 0)
-
-      const thickness = 0.1 * ((this._inputPoints.length - i) / this._inputPoints.length)
-
-      const c = this._inputPoints[i].clone().sub(perp.clone().multiplyScalar(thickness))
-      const d = this._inputPoints[i].clone().add(perp.clone().multiplyScalar(thickness))
-
-      points.push(c)
-      points.push(d)
-    }
-
-    points.push(this._inputPoints[this._inputPoints.length - 1])
-    
     const meshPositions = this._meshPositions.array as number[]
 
-    console.log(meshPositions.length, points.length * 3)
+    meshPositions[0] = this._inputPoints[0]
+    meshPositions[1] = this._inputPoints[1]
 
-    for (let i = 0, j = 0; i < points.length; i++, j += 3) {
-      meshPositions[j] = points[i].x
-      meshPositions[j + 1] = points[i].y
-      meshPositions[j + 2] = points[i].z
+    for (let i = 3, j = 3, k = 0; i < this._inputPoints.length - 3; i += 3, k++) {
+      const x = this._inputPoints[i]
+      const y = this._inputPoints[i + 1]
+
+      const previousX = this._inputPoints[i - 3]
+      const previousY = this._inputPoints[i - 2]
+
+      let directionX = x - previousX
+      let directionY = y - previousY
+
+      const length = Math.sqrt((directionX * directionX) + (directionY * directionY))
+
+      directionX /= length
+      directionY /= length
+
+      const perpendicularX = -directionY
+      const perpandicularY = directionX
+
+      const thickness = 0.1 * ((this._pointsToCapture - k) / this._pointsToCapture)
+
+      const cX = x - perpendicularX * thickness
+      const cY = y - perpandicularY * thickness
+
+      const dX = x + perpendicularX * thickness
+      const dY = y + perpendicularX * thickness
+
+      meshPositions[j++] = cX
+      meshPositions[j++] = cY
+
+      j++ // skip z
+
+      meshPositions[j++] = dX
+      meshPositions[j++] = dY
+
+      j++ // skip z
     }
 
-    console.log(this._meshPositions)
-
+    meshPositions[meshPositions.length - 3] = this._inputPoints[this._inputPoints.length - 3]
+    meshPositions[meshPositions.length - 2] = this._inputPoints[this._inputPoints.length - 2]
+    
     this._meshPositions.needsUpdate = true
   }
 }
