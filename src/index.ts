@@ -10,11 +10,11 @@ import Raycaster from './core/Raycaster'
 import SoundPlayer from './core/SoundPlayer'
 
 import Floor from './modules/Floor'
-import Biscuit from './modules/Biscuit'
-import BiscuitPiece from './modules/BiscuitPiece'
+import Biscuit from './modules/biscuit/Biscuit'
+import BiscuitPiece from './modules/biscuit/BiscuitPiece'
 import Paper from './modules/Paper'
 import Confettis from './modules/Confettis'
-import Slicer from './modules/Slicer'
+import Slicer from './modules/slicer/Slicer'
 
 class App {
   private _world: CANNON.World

@@ -1,9 +1,9 @@
 import * as THREE from 'three'
 import * as CANNON from 'cannon'
 
-import { vertexShaderPrecision, fragmentShaderPrecision } from '../core/shader'
+import { vertexShaderPrecision, fragmentShaderPrecision } from '../../core/shader'
 
-import Shadow from './Shadow'
+import Shadow from '../Shadow'
 
 const BODY_BOUNDING_BOX_REDUCTION = 0.5
 
@@ -53,6 +53,9 @@ export default class BiscuitPiece {
       gl_FragColor = vec4(vColor, 1.0);
     }
     `,
+    uniforms: {
+      lightPosition: { type: 'v3', value: new THREE.Vector3(0.5, -1, 0) }
+    },
     side: THREE.DoubleSide
   })
 

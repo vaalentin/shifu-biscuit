@@ -1,11 +1,12 @@
 import * as THREE from 'three'
 import * as CANNON from 'cannon'
 
-import Raycaster from '../core/Raycaster'
-import { GET } from '../core/ajax'
+import Raycaster from '../../core/Raycaster'
+import { GET } from '../../core/ajax'
+import { random } from '../../core/math'
 
 import BiscuitPiece from './BiscuitPiece'
-import Shadow from './Shadow'
+import Shadow from '../Shadow'
 
 export default class Biscuit {
   public el: THREE.Object3D
@@ -32,14 +33,14 @@ export default class Biscuit {
 
     this.body.position.set(0, 2, 0)
     this.body.angularVelocity.set(
-      Math.random() * 5,
-      Math.random() * 5,
-      Math.random() * 5
+      random(-0.5, 0.5),
+      random(-0.5, 0.5),
+      random(-0.5, 0.5)
     )
 
     this.pieces = []
 
-    new THREE.FileLoader().load(require<string>('../models/biscuit.json'), response => {
+    new THREE.FileLoader().load(require<string>('../../models/biscuit.json'), response => {
       const { pieces } = JSON.parse(response)
 
       for (let i = 0; i < pieces.length; ++i) {
