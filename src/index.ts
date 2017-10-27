@@ -96,8 +96,7 @@ class App {
     this._world.addBody(this._biscuit.body)
     this._raycaster.add(this._biscuit.el)
     this._slicer = new Slicer(this._renderer.domElement)
-    this._preRendering.scene.add(this._slicer.line)
-    this._preRendering.scene.add(this._slicer.mesh)
+    this._preRendering.scene.add(this._slicer.el)
 
     this._hitCount = 0
 
@@ -154,8 +153,6 @@ class App {
 
   private _handleRaycast(interestion: THREE.Intersection) {
     const { point, object } = interestion
-
-    
     
     this._shoutSounds[this._soundIndex].play()
 
@@ -240,6 +237,8 @@ class App {
     if (this._active) {
       this._world.step(1 / 60, delta, 3)
       
+      this._slicer.update()
+
       this._confettis.update(delta)
     
       this._biscuit.update()

@@ -1,18 +1,17 @@
 import * as THREE from 'three'
+import { TweenMax, Expo } from 'gsap'
 
 import { map } from '../core/math'
 
-export default class Slicer {
-  private static _NULL = -2
-
-  private static _lineMaterial = new THREE.RawShaderMaterial({
+class SlicerLine {
+  private static _material = new THREE.RawShaderMaterial({
     vertexShader: `
     precision mediump float;
 
-    attribute vec3 position;
+    attribute vec2 position;
 
     void main() {
-      gl_Position = vec4(position, 1.0);
+      gl_Position = vec4(position, 0.0, 1.0);
     }
     `,
     fragmentShader: `
@@ -26,29 +25,157 @@ export default class Slicer {
     depthWrite: false
   })
 
-  private static _meshMaterial = new THREE.RawShaderMaterial({
+  public el: THREE.Line
+
+  private _geometry: THREE.BufferGeometry
+
+  private _positions: THREE.BufferAttribute
+
+  constructor(pointsCount: number) {
+    this._geometry = new THREE.BufferGeometry()
+
+    this._positions = new THREE.BufferAttribute(new Float32Array(pointsCount * 2), 2)
+
+    this._geometry.addAttribute('position', this._positions)
+    this._geometry.drawRange.count = 0
+
+    this.el = new THREE.Line(this._geometry, SlicerLine._material)
+    this.el.frustumCulled = false
+    this.el.visible = false
+  }
+
+  public setDrawCount(count: number) {
+    this._geometry.drawRange.count = count
+    
+    this.el.visible = count !== 0
+  }
+
+  public update(points: Float32Array) {
+    const positions = this._positions.array as number[]
+    
+    for (let i = 0; i < points.length; i += 2) {
+      positions[i] = points[i]
+      positions[i + 1] = points[i + 1]
+    }
+    
+    this._positions.needsUpdate = true    
+  }
+}
+
+class SlicerMesh {
+  private static _material = new THREE.RawShaderMaterial({
     vertexShader: `
     precision mediump float;
 
-    attribute vec3 position;
+    attribute vec2 position;
 
     void main() {
-      gl_Position = vec4(position, 1.0);
+      gl_Position = vec4(position, 0.0, 1.0);
     }
     `,
     fragmentShader: `
     precision mediump float;
     
     void main() {
-      gl_FragColor = vec4(1.0, 0.0, 0.0, 1.0);
+      gl_FragColor = vec4(vec3(1.0), 1.0);
     }
     `,
     depthTest: false,
     depthWrite: false
   })
 
-  public line: THREE.Line
-  public mesh: THREE.Mesh
+  public el: THREE.Mesh
+
+  public thicknessScale: number
+
+  private _geometry: THREE.BufferGeometry
+
+  private _positions: THREE.BufferAttribute
+
+  constructor(pointsCount: number) {
+    this._geometry = new THREE.BufferGeometry()
+
+    pointsCount = ((pointsCount - 2) * 2) + 2
+
+    this._positions = new THREE.BufferAttribute(new Float32Array(pointsCount * 2), 2)
+
+    this._geometry.addAttribute('position', this._positions)
+    this._geometry.drawRange.count = 0
+
+    this.el = new THREE.Mesh(this._geometry, SlicerMesh._material)
+    this.el.drawMode = THREE.TriangleStripDrawMode
+    this.el.frustumCulled = false
+    this.el.visible = false
+
+    this.thicknessScale = 1
+  }
+
+  public setDrawCount(count: number) {
+    this._geometry.drawRange.count = ((count - 2) * 2) + 2
+
+    this.el.visible = count !== 0
+  }
+
+  public update(points: Float32Array, count: number) {
+    const meshPositions = this._positions.array as number[]
+    
+    let i = 0
+
+    meshPositions[i] = points[i]
+
+    i++
+
+    meshPositions[i] = points[i]
+
+    i++
+
+    for (let j = 1; j < count; j++) {
+      const k = j * 2
+
+      const x = points[k]
+      const y = points[k + 1]
+
+      const previousX = points[k - 2]
+      const previousY = points[k - 1]
+
+      let directionX = x - previousX
+      let directionY = y - previousY
+
+      const length = Math.sqrt((directionX * directionX) + (directionY * directionY))
+
+      directionX /= length
+      directionY /= length
+
+      const perpendicularX = -directionY
+      const perpendicularY = directionX
+
+      const thickness = map(j, 0, count, 0.1 * this.thicknessScale, 0)
+
+      const cX = x - perpendicularX * thickness
+      const cY = y - perpendicularY * thickness
+
+      const dX = x + perpendicularX * thickness
+      const dY = y + perpendicularY * thickness
+
+      meshPositions[i++] = cX
+      meshPositions[i++] = cY
+
+      meshPositions[i++] = dX
+      meshPositions[i++] = dY
+    }
+
+    // meshPositions[i] = points[i]
+
+    // i++
+
+    // meshPositions[i] = points[i]
+    
+    this._positions.needsUpdate = true
+  }
+}
+
+export default class Slicer {
+  public el: THREE.Object3D
 
   private _$el: HTMLElement
 
@@ -56,21 +183,31 @@ export default class Slicer {
   private _height: number
 
   private _pointsToCapture: number
-
   private _minimumDistanceBetweenPoints: number
+  private _maximumPoints: number
+
   private _lastPointX: number
   private _lastPointY: number
 
   private _inputPoints: Float32Array
 
-  private _linePositions: THREE.BufferAttribute
-  private _meshPositions: THREE.BufferAttribute
+  private _enabled: boolean
+  private _active: boolean
+  
+  private _previousX: number
+  private _previousY: number
+  private _x: number
+  private _y: number
 
-  private _isMouseDown: boolean
+  private _drawCount: number
+  private _pointsAdded: number
 
-  private _tempPoint: THREE.Vector3
+  private _line: SlicerLine
+  private _mesh: SlicerMesh
 
   constructor($el: HTMLElement) {
+    this.el = new THREE.Object3D()
+
     this._$el = $el
 
     this._width = this._$el.offsetWidth
@@ -79,51 +216,33 @@ export default class Slicer {
     // input points
     this._pointsToCapture = 8
 
-    this._minimumDistanceBetweenPoints = 0.1
+    this._minimumDistanceBetweenPoints = 30
+    this._maximumPoints = 12
     this._lastPointX = 0
     this._lastPointY = 0
 
-
-    this._inputPoints = new Float32Array(this._pointsToCapture * 3)
+    this._inputPoints = new Float32Array(this._pointsToCapture * 2)
 
     for (let i = 0; i < this._inputPoints.length; i++) {
-      this._inputPoints[i] = Slicer._NULL
+      this._inputPoints[i] = 0
     }
 
-    // line
-    const linePoints = new Float32Array(this._pointsToCapture * 3)
-    
-    for (let i = 0; i < this._inputPoints.length; i++) {
-      linePoints[i] = 0
-    }
+    this._enabled = true
+    this._active = false
 
-    this._linePositions = new THREE.BufferAttribute(linePoints, 3)
+    this._drawCount = 0
+    this._pointsAdded = 0
 
-    const lineGeometry = new THREE.BufferGeometry()
-    lineGeometry.addAttribute('position', this._linePositions)
+    this._line = new SlicerLine(this._pointsToCapture)
+    // this.el.add(this._line.el)
 
-    this.line = new THREE.Line(lineGeometry, Slicer._lineMaterial)
+    this._mesh = new SlicerMesh(this._pointsToCapture)
+    this.el.add(this._mesh.el)
 
-    // mesh
-    const meshPoints = new Float32Array(
-      (((this._pointsToCapture - 2) * 2) + 2) * 3
-    )
-
-    for (let i = 0; i < meshPoints.length; i += 3) {
-      meshPoints[i] = Math.random() * 2 - 1
-      meshPoints[i + 1] = Math.random() * 2 - 1
-      meshPoints[i + 2] = 0
-    }
-
-    this._meshPositions = new THREE.BufferAttribute(meshPoints, 3)
-
-    const meshGeometry = new THREE.BufferGeometry()
-    meshGeometry.addAttribute('position', this._meshPositions)
-
-    this.mesh = new THREE.Mesh(meshGeometry, Slicer._meshMaterial)
-    this.mesh.drawMode = THREE.TriangleStripDrawMode
-
-    this._isMouseDown = false
+    this._previousX = 0
+    this._previousY = 0
+    this._x = 0
+    this._y = 0
 
     this._bindMethods()
     this._addListeners()
@@ -139,8 +258,11 @@ export default class Slicer {
   private _addListeners() {
     window.addEventListener('resize', this._handleResize)
     this._$el.addEventListener('mousedown', this._handleTouchStart)
+    this._$el.addEventListener('touchstart', this._handleTouchStart)
     this._$el.addEventListener('mousemove', this._handleTouchMove)
+    this._$el.addEventListener('touchmove', this._handleTouchMove)
     this._$el.addEventListener('mouseup', this._handleTouchEnd)
+    this._$el.addEventListener('touchend', this._handleTouchEnd)
   }
 
   private _handleResize() {
@@ -148,109 +270,168 @@ export default class Slicer {
     this._height = this._$el.offsetHeight
   }
 
-  private _handleTouchStart(event: MouseEvent) {
-    this._isMouseDown = true
+  private _handleTouchStart(event: MouseEvent | TouchEvent) {
+    event.preventDefault()
 
-    this._addPoint(event.offsetX, event.offsetY)
-  }
+    this._active = true
 
-  private _handleTouchMove(event: MouseEvent) {
-    if (!this._isMouseDown) {
+    if (!this._enabled) {
       return
     }
 
-    this._addPoint(event.offsetX, event.offsetY)
+    const [x, y] = this._getCoordinates(event)
+
+    this._addPoint(x, y)
+  }
+
+  private _handleTouchMove(event: MouseEvent | TouchEvent) {
+    event.preventDefault()
+
+    if (!this._enabled || !this._active) {
+      return
+    }
+
+    const [x, y] = this._getCoordinates(event)
+
+    this._previousX = this._x
+    this._previousY = this._y
+    this._x = x
+    this._y = y
+
+    this._addPoint(x, y)
   }
 
   private _handleTouchEnd() {
-    this._isMouseDown = false
+    if (!this._enabled) {
+      return
+    }
+
+    this._stop()
   }
 
-  private _addPoint(x: number, y: number) {
+  private _getCoordinates(event: MouseEvent | TouchEvent): [number, number] {
+    switch (event.type) {
+      case 'touchstart':
+      case 'touchmove':
+      case 'touchend':
+        event = event as TouchEvent
+
+        return [
+          event.touches[0].pageX,
+          event.touches[0].pageY
+        ]
+
+      case 'mousedown':
+      case 'mousemove':
+      case 'mouseup':
+        event = event as MouseEvent
+
+        return [
+          event.pageX,
+          event.pageY
+        ]
+
+      default:
+        return [0, 0]
+    }
+  }
+
+  private _isPointFarEnough(x: number, y: number) {
+    if (this._lastPointX === null || this._lastPointY === null) {
+      return true
+    }
+
     const dx = x - this._lastPointX
     const dy = y - this._lastPointY
 
     const distanceToPreviousPoint = Math.sqrt((dx * dx) + (dy * dy))
 
-    if (distanceToPreviousPoint < 5) {
+    return  distanceToPreviousPoint > this._minimumDistanceBetweenPoints
+  }
+
+  private _addPoint(x: number, y: number) {
+    if (!this._isPointFarEnough(x, y)) {
       return
     }
+
+    this._drawCount = Math.min(this._drawCount + 1, this._pointsToCapture)
+    this._pointsAdded++
+
+    if (this._pointsAdded > this._maximumPoints) {
+      return this._stop()
+    }
+
+    this._line.setDrawCount(this._drawCount)
+    this._mesh.setDrawCount(this._drawCount)
 
     this._lastPointX = x
     this._lastPointY = y
 
-    for (let i = this._inputPoints.length - 1; i > 0; i -= 3) {
-      this._inputPoints[i] = this._inputPoints[i - 3]
-      this._inputPoints[i - 1] = this._inputPoints[i - 4]
-      this._inputPoints[i - 2] = this._inputPoints[i - 5]
+    for (let i = this._inputPoints.length - 1; i > 0; i -= 2) {
+      this._inputPoints[i] = this._inputPoints[i - 2]
+      this._inputPoints[i - 1] = this._inputPoints[i - 3]
     }
 
     this._inputPoints[0] = map(x, 0, this._width, -1, 1)
     this._inputPoints[1] = map(y, 0, this._height, 1, -1)
-    this._inputPoints[2] = 0
 
     this._updateLine()
     this._updateMesh()
   }
 
-  private _updateLine() {
-    const linePositions = this._linePositions.array as number[]
-
-    for (let i = 0; i < this._inputPoints.length; i += 3) {
-      linePositions[i] = this._inputPoints[i]
-      linePositions[i + 1] = this._inputPoints[i + 1]
-      linePositions[i + 2] = this._inputPoints[i + 2]
-    }
-
-    this._linePositions.needsUpdate = true    
+  private _updateLine() {  
+    this._line.update(this._inputPoints)
   }
 
   private _updateMesh() {
-    const meshPositions = this._meshPositions.array as number[]
+    this._mesh.update(this._inputPoints, this._drawCount)
+  }
 
-    meshPositions[0] = this._inputPoints[0]
-    meshPositions[1] = this._inputPoints[1]
-
-    for (let i = 3, j = 3, k = 0; i < this._inputPoints.length - 3; i += 3, k++) {
-      const x = this._inputPoints[i]
-      const y = this._inputPoints[i + 1]
-
-      const previousX = this._inputPoints[i - 3]
-      const previousY = this._inputPoints[i - 2]
-
-      let directionX = x - previousX
-      let directionY = y - previousY
-
-      const length = Math.sqrt((directionX * directionX) + (directionY * directionY))
-
-      directionX /= length
-      directionY /= length
-
-      const perpendicularX = -directionY
-      const perpandicularY = directionX
-
-      const thickness = 0.1 * ((this._pointsToCapture - k) / this._pointsToCapture)
-
-      const cX = x - perpendicularX * thickness
-      const cY = y - perpandicularY * thickness
-
-      const dX = x + perpendicularX * thickness
-      const dY = y + perpendicularX * thickness
-
-      meshPositions[j++] = cX
-      meshPositions[j++] = cY
-
-      j++ // skip z
-
-      meshPositions[j++] = dX
-      meshPositions[j++] = dY
-
-      j++ // skip z
+  private _stop() {
+    this._enabled = false    
+    this._active = false
+    
+    const props = {
+      progress: 1
     }
 
-    meshPositions[meshPositions.length - 3] = this._inputPoints[this._inputPoints.length - 3]
-    meshPositions[meshPositions.length - 2] = this._inputPoints[this._inputPoints.length - 2]
+    TweenMax.to(props, 0.3, {
+      progress: 0,
+      ease: Expo.easeOut,
+      onUpdate: () => {
+        this._mesh.thicknessScale = props.progress
+
+        this._updateLine()
+        this._updateMesh()
+      },
+      onComplete: () => {
+        this._enabled = true
+        
+        this._lastPointX = null
+        this._lastPointY = null
     
-    this._meshPositions.needsUpdate = true
+        this._drawCount = 0
+        this._pointsAdded = 0
+
+        this._line.setDrawCount(this._drawCount)
+        this._mesh.setDrawCount(this._drawCount)
+
+        this._mesh.thicknessScale = 1
+
+        this._updateLine()
+        this._updateMesh()
+      }
+    } as any)
+  }
+
+  public update() {
+    if (!this._active) {
+      return
+    }
+
+    const dirX = this._x - this._previousX
+    const dirY = this._y - this._previousY
+
+    const length = Math.sqrt((dirX * dirX) + (dirY * dirY))
   }
 }
