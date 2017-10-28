@@ -1,5 +1,4 @@
 import * as THREE from 'three'
-import * as CANNON from 'cannon'
 
 import { vertexShaderPrecision, fragmentShaderPrecision } from '../core/shader'
 
@@ -37,8 +36,6 @@ export default class Floor {
 
   public el: THREE.Mesh
 
-  public body: CANNON.Body
-
   constructor() {
     const geometry = new THREE.PlaneBufferGeometry(10, 10)
 
@@ -67,17 +64,6 @@ export default class Floor {
 
     this.el.quaternion.setFromAxisAngle(
       new THREE.Vector3(1, 0, 0),
-      -Math.PI / 2
-    )
-
-    this.body = new CANNON.Body({ mass: 0 })
-
-    const shape = new CANNON.Plane()
-
-    this.body.addShape(shape)
-
-    this.body.quaternion.setFromAxisAngle(
-      new CANNON.Vec3(1, 0, 0),
       -Math.PI / 2
     )
   }
