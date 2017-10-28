@@ -111,16 +111,16 @@ export default class Biscuit {
     piece.active = true
   }
 
-  public bouncePiece(piece: BiscuitPiece, point: THREE.Vector3) {
+  public bouncePiece(piece: BiscuitPiece, point: THREE.Vector3, direction: THREE.Vector2) {
     piece.body.applyForce(
-      new CANNON.Vec3(0, 500, 0),
+      new CANNON.Vec3(direction.x * 500, 500, -direction.y * 500),
       new CANNON.Vec3(point.x, point.y, point.z)
     )
   }
 
-  public bounce(point: THREE.Vector3) {
+  public bounce(point: THREE.Vector3, direction: THREE.Vector2) {
     this.body.applyForce(
-      new CANNON.Vec3(0, 100, 0),
+      new CANNON.Vec3(direction.x * 100, 100, -direction.y * 100),
       new CANNON.Vec3(point.x, point.y, point.z)
     )
   }

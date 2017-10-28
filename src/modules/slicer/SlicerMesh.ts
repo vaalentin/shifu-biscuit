@@ -8,18 +8,42 @@ export default class SlicerMesh {
     precision mediump float;
 
     attribute vec2 position;
+    attribute float progress;
+
+    varying float vProgress;
 
     void main() {
+      vProgress = progress;
+
       gl_Position = vec4(position, 0.0, 1.0);
     }
     `,
     fragmentShader: `
     precision mediump float;
+
+    uniform vec3 fromColor;
+    uniform vec3 toColor;
+
+    varying float vProgress;
     
     void main() {
-      gl_FragColor = vec4(vec3(1.0), 1.0);
+      vec3 color = mix(toColor, fromColor, vProgress);
+
+      gl_FragColor = vec4(color, 1.0);
     }
     `,
+    uniforms: {
+      fromColor: {
+        type: 'v3',
+        value: Math.random() < 0.5
+          ? new THREE.Vector3(0, 1, 0.5)
+          : new THREE.Vector3(1, 0, 0.5)
+      },
+      toColor: {
+        type: 'v3',
+        value: new THREE.Vector3(1, 1, 1)
+      }
+    },
     depthTest: false,
     depthWrite: false
   })
@@ -31,6 +55,7 @@ export default class SlicerMesh {
   private _geometry: THREE.BufferGeometry
 
   private _positions: THREE.BufferAttribute
+  private _progresses: THREE.BufferAttribute
 
   constructor(pointsCount: number) {
     this._geometry = new THREE.BufferGeometry()
@@ -38,8 +63,10 @@ export default class SlicerMesh {
     pointsCount = ((pointsCount - 2) * 2) + 2
 
     this._positions = new THREE.BufferAttribute(new Float32Array(pointsCount * 2), 2)
+    this._progresses = new THREE.BufferAttribute(new Float32Array(pointsCount), 1)
 
     this._geometry.addAttribute('position', this._positions)
+    this._geometry.addAttribute('progress', this._progresses)
     this._geometry.drawRange.count = 0
 
     this.el = new THREE.Mesh(this._geometry, SlicerMesh._material)
@@ -50,6 +77,20 @@ export default class SlicerMesh {
     this.thicknessScale = 1
   }
 
+  public setRandomColor() {
+    const value = Math.random()
+
+    if (value < 0.33) {
+      SlicerMesh._material.uniforms.fromColor.value.set(1, 0.5, 0)
+    }
+    else if (value < 0.66) {
+      SlicerMesh._material.uniforms.fromColor.value.set(0, 1, 0.5)
+    }
+    else {
+      SlicerMesh._material.uniforms.fromColor.value.set(1, 0, 0.5)
+    }
+  }
+
   public setDrawCount(count: number) {
     this._geometry.drawRange.count = ((count - 2) * 2) + 2
 
@@ -58,8 +99,10 @@ export default class SlicerMesh {
 
   public update(points: Float32Array, count: number) {
     const meshPositions = this._positions.array as number[]
+    const meshProgresses = this._progresses.array as number[]
     
     let i = 0
+    let l = 0
 
     meshPositions[i] = points[i]
 
@@ -68,6 +111,8 @@ export default class SlicerMesh {
     meshPositions[i] = points[i]
 
     i++
+
+    meshProgresses[l] = 1
 
     for (let j = 1; j < count; j++) {
       const k = j * 2
@@ -102,14 +147,20 @@ export default class SlicerMesh {
 
       meshPositions[i++] = dX
       meshPositions[i++] = dY
+
+      const progress = map(j, 0, count, 1, 0)
+
+      meshProgresses[l++] = progress
+      meshProgresses[l++] = progress
     }
 
-    // meshPositions[i] = points[i]
+    meshPositions[i] = points[i]
 
-    // i++
+    i++
 
-    // meshPositions[i] = points[i]
+    meshPositions[i] = points[i]
     
     this._positions.needsUpdate = true
+    this._progresses.needsUpdate = true
   }
 }

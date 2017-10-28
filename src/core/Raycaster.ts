@@ -6,7 +6,6 @@ export default class Raycaster {
   private _$el: HTMLElement
 
   private _raycaster: THREE.Raycaster
-  private _mouse: THREE.Vector2
 
   private _els: THREE.Object3D[]
 
@@ -16,41 +15,24 @@ export default class Raycaster {
     this._$el = $el
 
     this._raycaster = new THREE.Raycaster()
-    this._mouse = new THREE.Vector2()
 
     this._els = []
 
     this.onCast = new Signal<THREE.Intersection>()
-
-    this._bindMethods()
-    this._addListeners()
   }
 
-  private _bindMethods() {
-    this._handleMouseMove = this._handleMouseMove.bind(this)
-  }
-
-  private _addListeners() {
-    this._$el.addEventListener('mousemove', this._handleMouseMove)
-  }
-
-  private _handleMouseMove(e: MouseEvent) {
-    this._mouse.set(
-      e.offsetX / this._$el.offsetWidth * 2 - 1,
-      -(e.offsetY / this._$el.offsetHeight) * 2 + 1
-    )
-  }
-
-  public cast(camera: THREE.PerspectiveCamera) {
-    this._raycaster.setFromCamera(this._mouse, camera)
+  public cast(camera: THREE.PerspectiveCamera, mousePosition: THREE.Vector2): boolean {
+    this._raycaster.setFromCamera(mousePosition, camera)
 
     const intersects = this._raycaster.intersectObjects(this._els, true)
 
     if (!intersects.length) {
-      return
+      return false
     }
 
     this.onCast.dispatch(intersects[0])
+
+    return true
   }
 
   public add(el: THREE.Object3D) {

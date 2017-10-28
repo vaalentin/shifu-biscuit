@@ -10,6 +10,7 @@ import Raycaster from './core/Raycaster'
 import SoundPlayer from './core/SoundPlayer'
 
 import Floor from './modules/Floor'
+import Room from './modules/Room'
 import Biscuit from './modules/biscuit/Biscuit'
 import BiscuitPiece from './modules/biscuit/BiscuitPiece'
 import Paper from './modules/Paper'
@@ -31,6 +32,7 @@ class App {
   private _soundIndex: number
 
   private _floor: Floor
+  private _room: Room
   private _biscuit: Biscuit
   private _paper: Paper
   private _confettis: Confettis
@@ -40,7 +42,12 @@ class App {
 
   private _blurAmmount: number
 
-  private _active: boolean
+  private _isActive: boolean
+
+  private _canSlice: boolean
+
+  private _sliceMousePosition: THREE.Vector2
+  private _sliceDirection: THREE.Vector2
 
   constructor() {
     this._world = new CANNON.World()
@@ -80,11 +87,19 @@ class App {
 
     this._floor = new Floor()
     this._preRendering.scene.add(this._floor.el)
-    this._world.addBody(this._floor.body)
+
+    this._room = new Room()
+    this._world.addBody(this._room.floorBody)
+    this._world.addBody(this._room.leftWallBody)
+    this._world.addBody(this._room.rightWallBody)
+    this._world.addBody(this._room.backWallBody)
+    this._world.addBody(this._room.frontWallBody)
 
     this._biscuit = new Biscuit()
     this._preRendering.scene.add(this._biscuit.el)
     this._preRendering.scene.add(this._biscuit.shadow.el)
+    this._world.addBody(this._biscuit.body)
+    this._raycaster.add(this._biscuit.el)
 
     this._paper = new Paper()
     // this._preRendering.scene.add(this._paper.el)
@@ -93,16 +108,25 @@ class App {
     this._preRendering.scene.add(this._confettis.confettis)
     this._preRendering.scene.add(this._confettis.shadows)
 
-    this._world.addBody(this._biscuit.body)
-    this._raycaster.add(this._biscuit.el)
-    this._slicer = new Slicer(this._renderer.domElement)
+    this._slicer = new Slicer(this._renderer.domElement, {
+      pointsCount: 8,
+      maximumPoints: 12,
+      minimumDistanceBetweenPoints: 30,
+      maximumDistanceBetweenPoints: 100,
+      minimumDistance: 40
+    })
+
     this._preRendering.scene.add(this._slicer.el)
 
     this._hitCount = 0
 
     this._blurAmmount = 0
 
-    this._active = false
+    this._isActive = false
+    this._canSlice = true
+
+    this._sliceMousePosition = new THREE.Vector2(0, 0)
+    this._sliceDirection = new THREE.Vector2(0, 0)
 
     this._bindMethods()
     this._addListeners()
@@ -113,7 +137,8 @@ class App {
   private _bindMethods() {
     this._update = this._update.bind(this)
     this._handleResize = this._handleResize.bind(this)
-    this._handleMouseDown = this._handleMouseDown.bind(this)
+    this._handleSliceUpdate = this._handleSliceUpdate.bind(this)
+    this._handleSliceEnd = this._handleSliceEnd.bind(this)
     this._handleRaycast = this._handleRaycast.bind(this)
     this._handleLoadProgress = this._handleLoadProgress.bind(this)
     this._handleLoadComplete = this._handleLoadComplete.bind(this)
@@ -121,10 +146,8 @@ class App {
 
   private _addListeners() {
     window.addEventListener('resize', this._handleResize)
-    this._renderer.domElement.addEventListener(
-      'mousedown',
-      this._handleMouseDown
-    )
+    this._slicer.onSliceUpate.add(this._handleSliceUpdate)
+    this._slicer.onSliceEnd.add(this._handleSliceEnd)
     this._raycaster.onCast.add(this._handleRaycast)
     THREE.DefaultLoadingManager.onProgress = this._handleLoadProgress
     THREE.DefaultLoadingManager.onLoad = this._handleLoadComplete
@@ -145,13 +168,38 @@ class App {
 
     this._preRendering.resize(width, height)
     this._postRendering.resize(width, height)
+
+    this._slicer.resize()
   }
 
-  private _handleMouseDown(e: MouseEvent) {
-    this._raycaster.cast(this._preRendering.camera)
+  private _handleSliceUpdate({ direction, rayCastPoints }) {
+    if (!this._canSlice) {
+      return
+    }
+
+    this._sliceDirection.copy(direction)
+
+    for (let i = 0; i < rayCastPoints.length; i += 2) {
+      const x = rayCastPoints[i]
+      const y = rayCastPoints[i + 1]
+
+      this._sliceMousePosition.set(x, y)
+
+      if (this._raycaster.cast(this._preRendering.camera, this._sliceMousePosition)) {
+        return this._canSlice = false
+      }
+    }
+  }
+
+  private _handleSliceEnd() {
+    this._canSlice = true
   }
 
   private _handleRaycast(interestion: THREE.Intersection) {
+    if (!this._canSlice) {
+      return
+    }
+
     const { point, object } = interestion
     
     this._shoutSounds[this._soundIndex].play()
@@ -165,7 +213,7 @@ class App {
     if (this._hitCount < 2) {
       this._shakeCamera(5)
 
-      this._biscuit.bounce(point)
+      this._biscuit.bounce(point, this._sliceDirection)
 
       this._hitCount++
     } else if (this._hitCount < 4) {
@@ -192,7 +240,7 @@ class App {
 
     if (piece) {
       if (piece.active) {
-        this._biscuit.bouncePiece(piece, point)
+        this._biscuit.bouncePiece(piece, point, this._sliceDirection)
       } else {
         this._biscuit.removePiece(
           piece,
@@ -205,7 +253,7 @@ class App {
   }
 
   private _start() {
-    this._active = true
+    this._isActive = true
   }
 
   private _shakeCamera(steps: number = 20) {
@@ -234,7 +282,7 @@ class App {
 
     const delta = this._clock.getDelta()
 
-    if (this._active) {
+    if (this._isActive) {
       this._world.step(1 / 60, delta, 3)
       
       this._slicer.update()
