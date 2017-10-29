@@ -19,11 +19,9 @@
           wav: !!this._audio.canPlayType('audio/wav; codecs="1"').replace(/^no$/, ''),
           webm: !!this._audio.canPlayType('audio/webm; codecs="vorbis"').replace(/^no$/, '')
         }
-
-        console.log(SoundPlayer._supportedTypes)
       }
 
-      this.setSrc(srcs)      
+      this.setSrc(srcs)
     }
 
     public setSrc(srcs: string[]) {
