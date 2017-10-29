@@ -84,9 +84,11 @@ export default class Slicer {
     this._isEnabled = true
     this._isTouchDown = false
 
-    // this._debugger = new SlicerDebugger()
-    // this.el.add(this._debugger.normal)
-    // this.el.add(this._debugger.rayCastPoints)
+    if (process.env.NODE_ENV === 'development') {
+      this._debugger = new SlicerDebugger()
+      this.el.add(this._debugger.normal)
+      this.el.add(this._debugger.rayCastPoints)
+    }
 
     this._bindMethods()
     this._addListeners()
