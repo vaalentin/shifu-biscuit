@@ -88,12 +88,16 @@ class App {
     this._floor = new Floor()
     this._preRendering.scene.add(this._floor.el)
 
-    this._room = new Room()
+    this._room = new Room(2, 2)
     this._world.addBody(this._room.floorBody)
     this._world.addBody(this._room.leftWallBody)
     this._world.addBody(this._room.rightWallBody)
     this._world.addBody(this._room.backWallBody)
     this._world.addBody(this._room.frontWallBody)
+
+    if (this._room.debugEl) {
+      this._preRendering.scene.add(this._room.debugEl)
+    }
 
     this._biscuit = new Biscuit()
     this._preRendering.scene.add(this._biscuit.el)
