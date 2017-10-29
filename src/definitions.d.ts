@@ -18,7 +18,9 @@ declare module '*.css' {
 }
 
 interface Process {
-  env: { [key: string]: string }
+  env: {
+    NODE_ENV: string
+  }
 }
 
 declare const process: Process
