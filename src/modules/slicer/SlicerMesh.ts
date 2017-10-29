@@ -35,9 +35,10 @@ export default class SlicerMesh {
     uniforms: {
       fromColor: {
         type: 'v3',
-        value: Math.random() < 0.5
-          ? new THREE.Vector3(0, 1, 0.5)
-          : new THREE.Vector3(1, 0, 0.5)
+        value:
+          Math.random() < 0.5
+            ? new THREE.Vector3(0, 1, 0.5)
+            : new THREE.Vector3(1, 0, 0.5)
       },
       toColor: {
         type: 'v3',
@@ -60,10 +61,16 @@ export default class SlicerMesh {
   constructor(pointsCount: number) {
     this._geometry = new THREE.BufferGeometry()
 
-    pointsCount = ((pointsCount - 2) * 2) + 2
+    pointsCount = (pointsCount - 2) * 2 + 2
 
-    this._positions = new THREE.BufferAttribute(new Float32Array(pointsCount * 2), 2)
-    this._progresses = new THREE.BufferAttribute(new Float32Array(pointsCount), 1)
+    this._positions = new THREE.BufferAttribute(
+      new Float32Array(pointsCount * 2),
+      2
+    )
+    this._progresses = new THREE.BufferAttribute(
+      new Float32Array(pointsCount),
+      1
+    )
 
     this._geometry.addAttribute('position', this._positions)
     this._geometry.addAttribute('progress', this._progresses)
@@ -82,17 +89,15 @@ export default class SlicerMesh {
 
     if (value < 0.33) {
       SlicerMesh._material.uniforms.fromColor.value.set(1, 0.5, 0)
-    }
-    else if (value < 0.66) {
+    } else if (value < 0.66) {
       SlicerMesh._material.uniforms.fromColor.value.set(0, 1, 0.5)
-    }
-    else {
+    } else {
       SlicerMesh._material.uniforms.fromColor.value.set(1, 0, 0.5)
     }
   }
 
   public setDrawCount(count: number) {
-    this._geometry.drawRange.count = ((count - 2) * 2) + 2
+    this._geometry.drawRange.count = (count - 2) * 2 + 2
 
     this.el.visible = count !== 0
   }
@@ -100,7 +105,7 @@ export default class SlicerMesh {
   public update(points: Float32Array, count: number) {
     const meshPositions = this._positions.array as number[]
     const meshProgresses = this._progresses.array as number[]
-    
+
     let i = 0
     let l = 0
 
@@ -126,7 +131,9 @@ export default class SlicerMesh {
       let directionX = x - previousX
       let directionY = y - previousY
 
-      const length = Math.sqrt((directionX * directionX) + (directionY * directionY))
+      const length = Math.sqrt(
+        directionX * directionX + directionY * directionY
+      )
 
       directionX /= length
       directionY /= length
@@ -159,7 +166,7 @@ export default class SlicerMesh {
     i++
 
     meshPositions[i] = points[i]
-    
+
     this._positions.needsUpdate = true
     this._progresses.needsUpdate = true
   }

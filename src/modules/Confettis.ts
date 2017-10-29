@@ -154,11 +154,20 @@ export default class Confettis {
 
     confettisGeometry.addAttribute('position', this._confettisPositions)
     confettisGeometry.addAttribute('lifeSpan', this._confettisLifeSpans)
-    confettisGeometry.addAttribute('color', new THREE.BufferAttribute(confettisColors, 3))
-    confettisGeometry.addAttribute('scale', new THREE.BufferAttribute(this._confettisScales, 1))
+    confettisGeometry.addAttribute(
+      'color',
+      new THREE.BufferAttribute(confettisColors, 3)
+    )
+    confettisGeometry.addAttribute(
+      'scale',
+      new THREE.BufferAttribute(this._confettisScales, 1)
+    )
 
     // confettis
-    this.confettis = new THREE.Points(confettisGeometry, Confettis._confettiMaterial)
+    this.confettis = new THREE.Points(
+      confettisGeometry,
+      Confettis._confettiMaterial
+    )
     this.confettis.visible = false
 
     // shadows arrays
@@ -183,7 +192,10 @@ export default class Confettis {
     shadowsGeometry.addAttribute('position', this._shadowsPositions)
     shadowsGeometry.addAttribute('influence', this._shadowsInfluences)
     shadowsGeometry.addAttribute('lifeSpan', this._confettisLifeSpans)
-    shadowsGeometry.addAttribute('scale', (confettisGeometry.attributes as any).scale)
+    shadowsGeometry.addAttribute(
+      'scale',
+      (confettisGeometry.attributes as any).scale
+    )
 
     // shadows
     this.shadows = new THREE.Points(shadowsGeometry, Confettis._shadowMaterial)
@@ -259,11 +271,12 @@ export default class Confettis {
       // check collisions with the floor and inverse velocity
       // note that the radius is only an approximation
       // TODO test on different devices
-      const radius = (this._confettisScales[j] * 0.01) * confettisLifeSpans[j]
+      const radius = this._confettisScales[j] * 0.01 * confettisLifeSpans[j]
 
       if (y < radius / 2) {
         y = 2 * radius - y
-        this._confettisPreviousPositions[i + 1] = 2 * radius - this._confettisPreviousPositions[i + 1]
+        this._confettisPreviousPositions[i + 1] =
+          2 * radius - this._confettisPreviousPositions[i + 1]
       }
 
       confettisPositions[i] = x

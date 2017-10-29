@@ -40,16 +40,19 @@ export default class Biscuit {
 
     this.pieces = []
 
-    new THREE.FileLoader().load(require<string>('../../models/biscuit.json'), response => {
-      const { pieces } = JSON.parse(response)
+    new THREE.FileLoader().load(
+      require<string>('../../models/biscuit.json'),
+      response => {
+        const { pieces } = JSON.parse(response)
 
-      for (let i = 0; i < pieces.length; ++i) {
-        const piece = new BiscuitPiece(pieces[i])
-        this.el.add(piece.el)
-        this.body.addShape(piece.boxShape, piece.boxShapeCenter)
-        this.pieces.push(piece)
+        for (let i = 0; i < pieces.length; ++i) {
+          const piece = new BiscuitPiece(pieces[i])
+          this.el.add(piece.el)
+          this.body.addShape(piece.boxShape, piece.boxShapeCenter)
+          this.pieces.push(piece)
+        }
       }
-    })
+    )
 
     this.active = true
   }
@@ -111,7 +114,11 @@ export default class Biscuit {
     piece.active = true
   }
 
-  public bouncePiece(piece: BiscuitPiece, point: THREE.Vector3, direction: THREE.Vector2) {
+  public bouncePiece(
+    piece: BiscuitPiece,
+    point: THREE.Vector3,
+    direction: THREE.Vector2
+  ) {
     piece.body.applyForce(
       new CANNON.Vec3(direction.x * 500, 500, -direction.y * 500),
       new CANNON.Vec3(point.x, point.y, point.z)

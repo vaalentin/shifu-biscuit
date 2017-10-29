@@ -1,7 +1,10 @@
 import * as THREE from 'three'
 import * as CANNON from 'cannon'
 
-import { vertexShaderPrecision, fragmentShaderPrecision } from '../../core/shader'
+import {
+  vertexShaderPrecision,
+  fragmentShaderPrecision
+} from '../../core/shader'
 
 import Shadow from '../Shadow'
 

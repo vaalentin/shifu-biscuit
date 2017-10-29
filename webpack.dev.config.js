@@ -7,12 +7,7 @@ const postCss = {
   loader: 'postcss-loader',
   options: {
     plugins: () => [
-      autoprefixer(
-        '> 1%',
-        'last 4 versions',
-        'Firefox ESR',
-        'not ie < 9'
-      )
+      autoprefixer('> 1%', 'last 4 versions', 'Firefox ESR', 'not ie < 9')
     ]
   }
 }

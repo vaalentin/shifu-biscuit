@@ -37,7 +37,7 @@ class App {
   private _paper: Paper
   private _confettis: Confettis
   private _slicer: Slicer
-  
+
   private _hitCount: number
 
   private _blurAmmount: number
@@ -75,7 +75,7 @@ class App {
     this._clock = new THREE.Clock()
 
     this._shoutSounds = new Array(3)
-    
+
     for (let i = 0; i < this._shoutSounds.length; i++) {
       this._shoutSounds[i] = new SoundPlayer([
         require<string>('./sounds/shout.mp3'),
@@ -189,8 +189,13 @@ class App {
 
       this._sliceMousePosition.set(x, y)
 
-      if (this._raycaster.cast(this._preRendering.camera, this._sliceMousePosition)) {
-        return this._canSlice = false
+      if (
+        this._raycaster.cast(
+          this._preRendering.camera,
+          this._sliceMousePosition
+        )
+      ) {
+        return (this._canSlice = false)
       }
     }
   }
@@ -205,7 +210,7 @@ class App {
     }
 
     const { point, object } = interestion
-    
+
     this._shoutSounds[this._soundIndex].play()
 
     this._soundIndex = (this._soundIndex + 1) % this._shoutSounds.length
@@ -264,7 +269,7 @@ class App {
     const timeline = new TimelineMax({
       onComplete: () => {
         this._preRendering.camera.lookAt(new THREE.Vector3(0, 0, 0))
-        
+
         this._blurAmmount = 0
       }
     })
@@ -288,11 +293,11 @@ class App {
 
     if (this._isActive) {
       this._world.step(1 / 60, delta, 3)
-      
+
       this._slicer.update()
 
       this._confettis.update(delta)
-    
+
       this._biscuit.update()
     }
 

@@ -21,7 +21,10 @@ export default class Raycaster {
     this.onCast = new Signal<THREE.Intersection>()
   }
 
-  public cast(camera: THREE.PerspectiveCamera, mousePosition: THREE.Vector2): boolean {
+  public cast(
+    camera: THREE.PerspectiveCamera,
+    mousePosition: THREE.Vector2
+  ): boolean {
     this._raycaster.setFromCamera(mousePosition, camera)
 
     const intersects = this._raycaster.intersectObjects(this._els, true)

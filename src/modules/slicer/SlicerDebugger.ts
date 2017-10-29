@@ -61,21 +61,38 @@ export default class SlicerDebugger {
 
     this._directionGeometry.addAttribute('position', this._directionPositions)
 
-    this.normal = new THREE.Line(this._directionGeometry, SlicerDebugger._directionMaterial)
+    this.normal = new THREE.Line(
+      this._directionGeometry,
+      SlicerDebugger._directionMaterial
+    )
     this.normal.frustumCulled = false
 
     // ray cast points
     this._rayCastPointsGeometry = new THREE.BufferGeometry()
 
-    this._rayCastPointsPositions = new THREE.BufferAttribute(new Float32Array(1000), 2)
-    
-    this._rayCastPointsGeometry.addAttribute('position', this._rayCastPointsPositions)
+    this._rayCastPointsPositions = new THREE.BufferAttribute(
+      new Float32Array(1000),
+      2
+    )
 
-    this.rayCastPoints = new THREE.Points(this._rayCastPointsGeometry, SlicerDebugger._rayCastPointsMaterial)
+    this._rayCastPointsGeometry.addAttribute(
+      'position',
+      this._rayCastPointsPositions
+    )
+
+    this.rayCastPoints = new THREE.Points(
+      this._rayCastPointsGeometry,
+      SlicerDebugger._rayCastPointsMaterial
+    )
     this.rayCastPoints.frustumCulled = false
   }
 
-  public updateDirection(originX: number, originY: number, directionX: number, directionY: number) {
+  public updateDirection(
+    originX: number,
+    originY: number,
+    directionX: number,
+    directionY: number
+  ) {
     const positions = this._directionPositions.array as number[]
 
     positions[0] = originX

@@ -47,7 +47,10 @@ export default class Room {
       })
 
       this.debugEl = new THREE.Mesh(geometry, material)
-      this.debugEl.quaternion.setFromAxisAngle(new THREE.Vector3(1, 0, 0), -Math.PI / 2)
+      this.debugEl.quaternion.setFromAxisAngle(
+        new THREE.Vector3(1, 0, 0),
+        -Math.PI / 2
+      )
     }
   }
 }

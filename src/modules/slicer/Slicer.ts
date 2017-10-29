@@ -50,7 +50,7 @@ export default class Slicer {
   private _isTouchDown: boolean
 
   private _debugger: SlicerDebugger
-  
+
   constructor($el: HTMLElement, settings: SlicerSettings) {
     this.el = new THREE.Object3D()
 
@@ -65,7 +65,10 @@ export default class Slicer {
     this._settings = settings
 
     this._$el = $el
-    this._$elSize = new THREE.Vector2(this._$el.offsetWidth, this._$el.offsetHeight)
+    this._$elSize = new THREE.Vector2(
+      this._$el.offsetWidth,
+      this._$el.offsetHeight
+    )
 
     this._inputPoints = new Float32Array(this._settings.pointsCount * 2)
     this._smoothedPoints = new Float32Array(this._settings.pointsCount * 2 * 2)
@@ -132,10 +135,10 @@ export default class Slicer {
     event.preventDefault()
 
     const [x, y] = this._getCoordinates(event)
-    
+
     this._previousPoint.copy(this._point)
     this._point.copy(this._previousPoint)
-    
+
     if (!this._isEnabled || !this._isTouchDown) {
       return
     }
@@ -181,7 +184,7 @@ export default class Slicer {
     let directionX = secondX - firstX
     let directionY = secondY - firstY
 
-    const length = Math.sqrt((directionX * directionX) + (directionY * directionY))
+    const length = Math.sqrt(directionX * directionX + directionY * directionY)
 
     directionX /= length
     directionY /= length
@@ -192,13 +195,12 @@ export default class Slicer {
     if (this._debugger) {
       const originX = this._inputPoints[0]
       const originY = this._inputPoints[1]
-  
+
       this._debugger.updateDirection(originX, originY, directionX, directionY)
     }
 
     return new THREE.Vector2(directionX, directionY)
   }
-
 
   /**
    * Get points along the first two segments of the line.
@@ -219,11 +221,11 @@ export default class Slicer {
 
       const nextX = this._inputPoints[j + 2]
       const nextY = this._inputPoints[j + 3]
-      
+
       let dirX = nextX - x
       let dirY = nextY - y
 
-      const length = Math.sqrt((dirX * dirX) + (dirY * dirY))
+      const length = Math.sqrt(dirX * dirX + dirY * dirY)
 
       dirX /= length
       dirY /= length
@@ -256,20 +258,14 @@ export default class Slicer {
       case 'touchend':
         event = event as TouchEvent
 
-        return [
-          event.touches[0].pageX,
-          event.touches[0].pageY
-        ]
+        return [event.touches[0].pageX, event.touches[0].pageY]
 
       case 'mousedown':
       case 'mousemove':
       case 'mouseup':
         event = event as MouseEvent
 
-        return [
-          event.pageX,
-          event.pageY
-        ]
+        return [event.pageX, event.pageY]
 
       default:
         return [0, 0]
@@ -280,31 +276,37 @@ export default class Slicer {
     if (this._lasPointAdded.x !== null && this._lasPointAdded.y !== null) {
       let dirX = x - this._lasPointAdded.x
       let dirY = y - this._lasPointAdded.y
-  
-      const length = Math.sqrt((dirX * dirX) + (dirY * dirY))
-  
+
+      const length = Math.sqrt(dirX * dirX + dirY * dirY)
+
       dirX /= length
       dirY /= length
 
       // new point too close, don't add it
       if (length < this._settings.minimumDistanceBetweenPoints) {
         return
-      }
-      // new point too far, put it closer
-      else if (length > this._settings.maximumDistanceBetweenPoints) {
-        x = this._lasPointAdded.x + dirX * this._settings.maximumDistanceBetweenPoints
-        y = this._lasPointAdded.y + dirY * this._settings.maximumDistanceBetweenPoints
+      } else if (length > this._settings.maximumDistanceBetweenPoints) {
+        // new point too far, put it closer
+        x =
+          this._lasPointAdded.x +
+          dirX * this._settings.maximumDistanceBetweenPoints
+        y =
+          this._lasPointAdded.y +
+          dirY * this._settings.maximumDistanceBetweenPoints
       }
     }
 
-    this._activePointsCount = Math.min(this._activePointsCount + 1, this._settings.pointsCount)
+    this._activePointsCount = Math.min(
+      this._activePointsCount + 1,
+      this._settings.pointsCount
+    )
     this._addedPointsCount++
 
     if (this._addedPointsCount > this._settings.maximumPoints) {
       return this._stop()
     }
 
-    this._mesh.setDrawCount((this._activePointsCount * 2) - 1)
+    this._mesh.setDrawCount(this._activePointsCount * 2 - 1)
 
     this._lasPointAdded.set(x, y)
 
@@ -357,9 +359,9 @@ export default class Slicer {
   private _stop() {
     this.onSliceEnd.dispatch()
 
-    this._isEnabled = false    
+    this._isEnabled = false
     this._isTouchDown = false
-    
+
     const props = {
       progress: 1
     }
@@ -376,11 +378,11 @@ export default class Slicer {
         this._isEnabled = true
 
         this._lasPointAdded.set(null, null)
-    
+
         this._activePointsCount = 0
         this._addedPointsCount = 0
 
-        this._mesh.setDrawCount((this._activePointsCount * 2) - 1)
+        this._mesh.setDrawCount(this._activePointsCount * 2 - 1)
 
         this._mesh.thicknessScale = 1
 
@@ -390,10 +392,7 @@ export default class Slicer {
   }
 
   public resize() {
-    this._$elSize.set(
-      this._$el.offsetWidth,
-      this._$el.offsetHeight
-    )
+    this._$elSize.set(this._$el.offsetWidth, this._$el.offsetHeight)
   }
 
   public update() {
@@ -401,6 +400,6 @@ export default class Slicer {
       return
     }
 
-    const delta = this._point.distanceTo(this._previousPoint)    
+    const delta = this._point.distanceTo(this._previousPoint)
   }
 }
