@@ -123,7 +123,7 @@ class App {
     this._slicer = new Slicer(this._renderer.domElement, {
       pointsCount: 8,
       maximumPoints: 12,
-      minimumDistanceBetweenPoints: 30,
+      minimumDistanceBetweenPoints: 50,
       maximumDistanceBetweenPoints: 100,
       minimumDistance: 40
     })
