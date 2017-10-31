@@ -12,6 +12,109 @@
 </head>
 
 <body>
+
+  <div class="introduction">
+
+    <svg class="introduction__title"
+      viewBox="0 0 400 100">
+  
+      <symbol id="shifu-text">
+
+        <text text-anchor="middle"
+          x="50%"
+          y="50%"
+          dy="0.35em">
+          Shifu
+        </text>
+
+      </symbol>
+
+      <clippath id="shifu-mask">
+        
+        <text text-anchor="middle"
+          x="50%"
+          y="50%"
+          dy=".35em">
+          Shifu
+        </text>
+
+      </clippath>
+
+      <g clip-path="url(#shifu-mask)" class="colortext">
+
+        <rect class="title__rect--background"
+          width="100%"
+          height="100%">
+        </rect>
+
+        <rect class="title__rect--foreground"
+          width="100%"
+          height="100%">
+        </rect>
+      
+      </g>
+
+      <use class="title__text--transparent"
+        xlink:href="#shifu-text">
+      </use>
+  
+    </svg>
+
+    <svg class="introduction__title"
+      viewBox="0 0 400 100">
+
+      <symbol id="biscuit-text">
+
+        <text text-anchor="middle"
+          x="50%"
+          y="50%"
+          dy="0.35em">
+          Biscuit
+        </text>
+
+      </symbol>
+
+      <clippath id="biscuit-mask">
+        
+        <text text-anchor="middle"
+          x="50%"
+          y="50%"
+          dy=".35em">
+          Biscuit
+        </text>
+
+      </clippath>
+
+      <g clip-path="url(#biscuit-mask)" class="colortext">
+
+        <rect class="title__rect--background"
+          width="100%"
+          height="100%">
+        </rect>
+
+        <rect class="title__rect--foreground"
+          width="100%"
+          height="100%">
+        </rect>
+      
+      </g>
+
+      <use class="title__text--transparent"
+        xlink:href="#biscuit-text">
+      </use>
+
+    </svg>  
+
+    <h2 class="introduction__loading"><span class="loading__letter">L</span><span class="loading__letter">o</span><span class="loading__letter">a</span><span class="loading__letter">d</span><span class="loading__letter">i</span><span class="loading__letter">n</span><span class="loading__letter">g</span></h2>
+
+    <h2 class="introduction__instructions">“Slash the biscuit to get your daily dose of wisdom.”</h2>
+
+    <button class="introduction__button">Press to start</button>
+
+    <script type="text/javascript">
+      <%= require('./index.inline.js') %>
+    </script>
+
 </body>
 
 </html>

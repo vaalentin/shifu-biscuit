@@ -9,6 +9,7 @@ import PostRendering from './core/PostRendering'
 import Raycaster from './core/Raycaster'
 import SoundPlayer from './core/SoundPlayer'
 
+import Introduction from './modules/Introduction'
 import Floor from './modules/Floor'
 import Room from './modules/Room'
 import Biscuit from './modules/biscuit/Biscuit'
@@ -30,6 +31,8 @@ class App {
 
   private _shoutSounds: SoundPlayer[]
   private _soundIndex: number
+
+  private _introduction: Introduction
 
   private _floor: Floor
   private _room: Room
@@ -84,6 +87,8 @@ class App {
     }
 
     this._soundIndex = 0
+
+    this._introduction = new Introduction()
 
     this._floor = new Floor()
     this._preRendering.scene.add(this._floor.el)
@@ -145,7 +150,6 @@ class App {
     this._handleSliceEnd = this._handleSliceEnd.bind(this)
     this._handleRaycast = this._handleRaycast.bind(this)
     this._handleLoadProgress = this._handleLoadProgress.bind(this)
-    this._handleLoadComplete = this._handleLoadComplete.bind(this)
   }
 
   private _addListeners() {
@@ -154,15 +158,26 @@ class App {
     this._slicer.onSliceEnd.add(this._handleSliceEnd)
     this._raycaster.onCast.add(this._handleRaycast)
     THREE.DefaultLoadingManager.onProgress = this._handleLoadProgress
-    THREE.DefaultLoadingManager.onLoad = this._handleLoadComplete
   }
 
   private _handleLoadProgress(url: number, loaded: number, total: number) {
-    // console.log(progress)
+    TweenMax.delayedCall(2, () => {
+      const onComplete = loaded === total
+        ? this._handleLoadComplete.bind(this)
+        : null
+        
+      this._introduction.setProgress(loaded / total, onComplete)
+    })
   }
 
   private _handleLoadComplete() {
-    this._start()
+    this._introduction.hideLoader()
+    this._introduction.displayIntro()
+
+    this._introduction.onStart.add(() => {
+      this._introduction.hideIntro()
+      this._start()
+    })
   }
 
   private _handleResize() {
