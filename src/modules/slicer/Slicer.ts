@@ -7,6 +7,8 @@ import Signal from '../../core/Signal'
 import SlicerMesh from './SlicerMesh'
 import SlicerDebugger from './SlicerDebugger'
 
+const ENABLE_HELPERS = true
+
 interface SlicerSettings {
   pointsCount: number
   maximumPoints: number
@@ -87,12 +89,14 @@ export default class Slicer {
     this._addedPointsCount = 0
 
     this._mesh = new SlicerMesh(this._settings.pointsCount * 2)
+    this._mesh.setDrawCount(0)
+    this._mesh.thicknessScale = 1
     this.el.add(this._mesh.el)
 
     this._isEnabled = true
     this._isTouchDown = false
 
-    if (process.env.NODE_ENV === 'development') {
+    if (process.env.NODE_ENV === 'development' && ENABLE_HELPERS) {
       this._debugger = new SlicerDebugger()
       this.el.add(this._debugger.normal)
       this.el.add(this._debugger.rayCastPoints)
