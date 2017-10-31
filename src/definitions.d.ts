@@ -24,3 +24,5 @@ interface Process {
 }
 
 declare const process: Process
+
+interface Window {}
