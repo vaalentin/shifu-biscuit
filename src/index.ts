@@ -176,6 +176,7 @@ class App {
 
     this._introduction.onStart.add(() => {
       this._introduction.hideIntro()
+      this._introduction = null
       this._start()
     })
   }

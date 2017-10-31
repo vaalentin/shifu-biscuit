@@ -156,11 +156,28 @@ export default class Introduction {
       opacity: 0,
       scale: 0.8,
       ease: Expo.easeOut,
-      onComplete: () => TweenMax.set(this._$el, { display: 'none' })
+      onComplete: this.dispose.bind(this)
     } as any)
   }
 
   public dispose() {
-   
+    this._$el.parentNode.removeChild(this._$el)
+
+    this._$el = null
+    this._$titles = null
+    this._$rects = null
+    this._$loading = null
+    this._$instructionsLetters = null
+    this._$button = null
+
+    this._scale = null
+
+    this.onStart.dispose()
+    this.onStart = null
+
+    this._updateRects = null
+    this._handleButtonMouseEnter = null
+    this._handleButtonMouseLeave = null
+    this._handleButtonClick = null
   }
 }
