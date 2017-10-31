@@ -18,6 +18,8 @@ import Paper from './modules/Paper'
 import Confettis from './modules/Confettis'
 import Slicer from './modules/slicer/Slicer'
 
+const SKIP_INTRODUCTION = true
+
 class App {
   private _world: CANNON.World
 
@@ -141,6 +143,11 @@ class App {
     this._addListeners()
 
     window.requestAnimationFrame(this._update)
+
+    if (SKIP_INTRODUCTION) {
+      this._introduction.dispose()
+      this._start()
+    }
   }
 
   private _bindMethods() {
@@ -161,6 +168,10 @@ class App {
   }
 
   private _handleLoadProgress(url: number, loaded: number, total: number) {
+    if (SKIP_INTRODUCTION) {
+      return
+    }
+
     TweenMax.delayedCall(2, () => {
       const onComplete = loaded === total
         ? this._handleLoadComplete.bind(this)
