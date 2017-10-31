@@ -18,8 +18,8 @@ import Paper from './modules/Paper'
 import Confettis from './modules/Confettis'
 import Slicer from './modules/slicer/Slicer'
 
-const SKIP_INTRODUCTION = true
-const PLAY_SOUNDS = false
+const SKIP_INTRODUCTION = false
+const PLAY_SOUNDS = true
 
 class App {
   private _world: CANNON.World
@@ -32,8 +32,10 @@ class App {
 
   private _clock: THREE.Clock
 
-  private _shoutSounds: SoundPlayer[]
-  private _soundIndex: number
+  private _sliceSound: SoundPlayer
+  private _hitSound: SoundPlayer
+  private _breakSound: SoundPlayer
+  private _explodeSound: SoundPlayer
 
   private _introduction: Introduction
 
@@ -80,16 +82,25 @@ class App {
 
     this._clock = new THREE.Clock()
 
-    this._shoutSounds = new Array(3)
+    this._hitSound = new SoundPlayer([
+      require<string>('./sounds/hit.mp3'),
+      require<string>('./sounds/hit.wav')
+    ])
 
-    for (let i = 0; i < this._shoutSounds.length; i++) {
-      this._shoutSounds[i] = new SoundPlayer([
-        require<string>('./sounds/shout.mp3'),
-        require<string>('./sounds/shout.wav')
-      ])
-    }
+    this._sliceSound = new SoundPlayer([
+      require<string>('./sounds/slice.mp3'),
+      require<string>('./sounds/slice.wav')
+    ])
 
-    this._soundIndex = 0
+    this._breakSound = new SoundPlayer([
+      require<string>('./sounds/break.mp3'),
+      require<string>('./sounds/break.wav')
+    ])
+
+    this._explodeSound = new SoundPlayer([
+      require<string>('./sounds/explode.mp3'),
+      require<string>('./sounds/explode.wav')
+    ])
 
     this._introduction = new Introduction()
 
@@ -209,6 +220,10 @@ class App {
       return
     }
 
+    if (PLAY_SOUNDS) {
+      this._sliceSound.play()
+    }
+
     this._sliceDirection.copy(direction)
 
     for (let i = 0; i < rayCastPoints.length; i += 2) {
@@ -239,17 +254,15 @@ class App {
 
     const { point, object } = interestion
 
-    if (PLAY_SOUNDS) {
-      this._shoutSounds[this._soundIndex].play()
-
-      this._soundIndex = (this._soundIndex + 1) % this._shoutSounds.length
-    }
-
     this._confettis.explode(point)
 
     let piece: BiscuitPiece
 
     if (this._hitCount < 2) {
+      if (PLAY_SOUNDS) {
+        this._hitSound.play()
+      }
+      
       this._shakeCamera(5)
 
       this._biscuit.bounce(point, this._sliceDirection)
@@ -269,6 +282,10 @@ class App {
       piece = this._biscuit.getPieceFromObject(object)
 
       if (!piece || !piece.active) {
+        if (PLAY_SOUNDS) {
+          this._explodeSound.play()
+        }
+
         this._biscuit.explode(
           this._world,
           this._preRendering.scene,
@@ -279,8 +296,16 @@ class App {
 
     if (piece) {
       if (piece.active) {
+        if (PLAY_SOUNDS) {
+          this._hitSound.play()
+        }
+        
         this._biscuit.bouncePiece(piece, point, this._sliceDirection)
       } else {
+        if (PLAY_SOUNDS) {
+          this._breakSound.play()
+        }
+
         this._biscuit.removePiece(
           piece,
           this._world,
