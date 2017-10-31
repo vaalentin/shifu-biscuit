@@ -71,6 +71,11 @@ export default class Slicer {
     )
 
     this._inputPoints = new Float32Array(this._settings.pointsCount * 2)
+
+    for (let i = 0; i < this._inputPoints.length; i++) {
+      this._inputPoints[i] = -10
+    }
+
     this._smoothedPoints = new Float32Array(this._settings.pointsCount * 2 * 2)
 
     this._lasPointAdded = new THREE.Vector2(null, null)
