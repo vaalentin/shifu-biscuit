@@ -19,6 +19,7 @@ import Confettis from './modules/Confettis'
 import Slicer from './modules/slicer/Slicer'
 
 const SKIP_INTRODUCTION = true
+const PLAY_SOUNDS = false
 
 class App {
   private _world: CANNON.World
@@ -238,9 +239,11 @@ class App {
 
     const { point, object } = interestion
 
-    this._shoutSounds[this._soundIndex].play()
+    if (PLAY_SOUNDS) {
+      this._shoutSounds[this._soundIndex].play()
 
-    this._soundIndex = (this._soundIndex + 1) % this._shoutSounds.length
+      this._soundIndex = (this._soundIndex + 1) % this._shoutSounds.length
+    }
 
     this._confettis.explode(point)
 
