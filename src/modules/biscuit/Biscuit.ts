@@ -33,9 +33,9 @@ export default class Biscuit {
 
     this.body.position.set(0, 2, 0)
     this.body.angularVelocity.set(
-      random(-0.5, 0.5),
-      random(-0.5, 0.5),
-      random(-0.5, 0.5)
+      random(-10, 10),
+      random(-10, 10),
+      random(-10, 10)
     )
 
     this.pieces = []
