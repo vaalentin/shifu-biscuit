@@ -16,6 +16,7 @@ import Biscuit from './modules/biscuit/Biscuit'
 import BiscuitPiece from './modules/biscuit/BiscuitPiece'
 import Paper from './modules/Paper'
 import Confettis from './modules/Confettis'
+import Explosion from './modules/Explosion'
 import Slicer from './modules/slicer/Slicer'
 
 const SKIP_INTRODUCTION = false
@@ -44,6 +45,7 @@ class App {
   private _biscuit: Biscuit
   private _paper: Paper
   private _confettis: Confettis
+  private _explosion: Explosion
   private _slicer: Slicer
 
   private _hitCount: number
@@ -68,13 +70,18 @@ class App {
       antialias: true
     })
 
+    this._renderer.autoClear = false
+
+    this._renderer.setClearColor('#8080ff', 1 );
+
     this._renderer.setPixelRatio(window.devicePixelRatio || 1)
     this._renderer.setSize(width, height)
     document.body.appendChild(this._renderer.domElement)
 
     this._preRendering = new PreRendering(width, height)
     this._preRendering.camera.position.set(0, 2, 2)
-    this._preRendering.camera.lookAt(new THREE.Vector3(0, 0, 0))
+    this._preRendering.camera.userData.lookAt = new THREE.Vector3(0, 0, 0)
+    this._preRendering.camera.lookAt(this._preRendering.camera.userData.lookAt)
 
     this._postRendering = new PostRendering(width, height)
 
@@ -130,6 +137,9 @@ class App {
     this._confettis = new Confettis(200)
     this._preRendering.scene.add(this._confettis.confettis)
     this._preRendering.scene.add(this._confettis.shadows)
+
+    this._explosion = new Explosion()
+    this._preRendering.scene.add(this._explosion.el)
 
     this._slicer = new Slicer(this._renderer.domElement, {
       pointsCount: 8,
@@ -277,8 +287,6 @@ class App {
         this._hitCount++
       }
     } else {
-      this._shakeCamera(10)
-
       piece = this._biscuit.getPieceFromObject(object)
 
       if (!piece || !piece.active) {
@@ -286,11 +294,18 @@ class App {
           this._explodeSound.play()
         }
 
+        this._shakeCamera(10, 0.3, 0.1)
+
+        this._explosion.explode(point)
+
         this._biscuit.explode(
           this._world,
           this._preRendering.scene,
           this._raycaster
         )
+      }
+      else {
+        this._shakeCamera(10)
       }
     }
 
@@ -320,7 +335,7 @@ class App {
     this._isActive = true
   }
 
-  private _shakeCamera(steps: number = 20) {
+  private _shakeCamera(steps: number = 20, amplitudeX = 0.1, amplitudeZ = 0.01, duration = 0.05) {
     const timeline = new TimelineMax({
       onComplete: () => {
         this._preRendering.camera.lookAt(new THREE.Vector3(0, 0, 0))
@@ -334,9 +349,9 @@ class App {
     this._blurAmmount = 2
 
     for (var i = 0; i < steps; i++) {
-      timeline.to(this._preRendering.camera.rotation, Math.random() * 0.05, {
-        z: rotation.z + (Math.random() * 2 - 1) * 0.1,
-        y: rotation.y + (Math.random() * 2 - 1) * 0.01
+      timeline.to(this._preRendering.camera.rotation, Math.random() * duration, {
+        z: rotation.z + (Math.random() * 2 - 1) * amplitudeX,
+        y: rotation.y + (Math.random() * 2 - 1) * amplitudeZ
       })
     }
   }
