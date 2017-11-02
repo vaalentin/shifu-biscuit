@@ -25,36 +25,67 @@ module.exports = {
     rules: [
       { test: /\.tsx?$/, use: 'ts-loader' },
       {
-        test: /\.inline.css$/,
-        use: [
+        test: /\.css$/,
+        oneOf: [
           {
-            loader: 'css-loader',
-            options: {
-              importLoaders: 1
-            }
+            resourceQuery: /inline/,
+            use: [
+              {
+                loader: 'css-loader',
+                options: {
+                  importLoaders: 1
+                }
+              },
+              postCss
+            ]
           },
-          postCss
+          {
+            use: [
+              { loader: 'style-loader' },
+              {
+                loader: 'css-loader',
+                options: {
+                  importLoaders: 1,
+                  modules: true,
+                  namedExport: true,
+                  localIdentName: '[local]_[hash:base64:5]'
+                }
+              },
+              postCss
+            ]
+          }
         ]
       },
       {
-        test: /\.css$/,
-        exclude: /\.inline.css$/,
-        use: [
-          { loader: 'style-loader' },
+        test: /\.js$/,
+        oneOf: [
           {
-            loader: 'css-loader',
-            options: {
-              importLoaders: 1,
-              modules: true,
-              namedExport: true,
-              localIdentName: '[local]_[hash:base64:5]'
-            }
-          },
-          postCss
+            resourceQuery: /inline/,
+            use: 'raw-loader'
+          }
         ]
       },
-      { test: /\.inline.js$/, use: 'raw-loader' },
-      { test: /\.(json|mp3|wav|eot|woff2|woff|ttf|svg)$/, use: 'file-loader' }
+      {
+        test: /\.json$/,
+        oneOf: [
+          {
+            resourceQuery: /uncached/,
+            use: [
+              {
+                loader: 'file-loader',
+                options: {
+                  name: '[name].[ext]'
+                }
+              }
+            ]
+          },
+          {
+            use: 'file-loader'
+          }
+        ]
+      },
+      { test: /\.(mp3|wav)$/, use: 'file-loader' },
+      { test: /\.(eot|woff2|woff|ttf|svg)$/, use: 'file-loader' }
     ]
   },
   plugins: [
