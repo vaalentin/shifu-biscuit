@@ -1,3 +1,5 @@
+import { fileLoader } from './Loaders'
+
 export default class SoundPlayer {
   private static _supportedTypes: { [name: string]: boolean }
 
@@ -33,27 +35,23 @@ export default class SoundPlayer {
       }
     }
 
-    this.setSrc(srcs)
+    this._setSrc(srcs)
   }
 
-  public setSrc(srcs: string[]) {
-    let src: string
-
+  private _setSrc(srcs: string[]) {
     for (let i = 0; i < srcs.length; i++) {
-      const extension = srcs[i].split('.').pop()
+      const src = srcs[i]
+      const extension = src.split('.').pop()
 
       if (SoundPlayer._supportedTypes[extension]) {
-        src = srcs[i]
-        break
+        fileLoader.load(src, () => {
+          this._audio.setAttribute('src', src)
+          this._audio.load()
+        })
+        
+        return
       }
     }
-
-    if (!src) {
-      return
-    }
-
-    this._audio.setAttribute('src', src)
-    this._audio.load()
   }
 
   public play() {

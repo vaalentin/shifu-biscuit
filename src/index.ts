@@ -18,6 +18,7 @@ import Paper from './modules/Paper'
 import Confettis from './modules/Confettis'
 import Explosion from './modules/Explosion'
 import Slicer from './modules/slicer/Slicer'
+import Sounds from './modules/Sounds'
 
 const SKIP_INTRODUCTION = false
 const PLAY_SOUNDS = true
@@ -33,13 +34,7 @@ class App {
 
   private _clock: THREE.Clock
 
-  private _sliceSound: SoundPlayer
-  private _hitSound: SoundPlayer
-  private _breakSound: SoundPlayer
-  private _explodeSound: SoundPlayer
-
   private _introduction: Introduction
-
   private _floor: Floor
   private _room: Room
   private _biscuit: Biscuit
@@ -47,6 +42,7 @@ class App {
   private _confettis: Confettis
   private _explosion: Explosion
   private _slicer: Slicer
+  private _sounds: Sounds
 
   private _hitCount: number
 
@@ -89,26 +85,6 @@ class App {
 
     this._clock = new THREE.Clock()
 
-    this._hitSound = new SoundPlayer([
-      require<string>('./sounds/hit.mp3'),
-      require<string>('./sounds/hit.wav')
-    ])
-
-    this._sliceSound = new SoundPlayer([
-      require<string>('./sounds/slice.mp3'),
-      require<string>('./sounds/slice.wav')
-    ])
-
-    this._breakSound = new SoundPlayer([
-      require<string>('./sounds/break.mp3'),
-      require<string>('./sounds/break.wav')
-    ])
-
-    this._explodeSound = new SoundPlayer([
-      require<string>('./sounds/explode.mp3'),
-      require<string>('./sounds/explode.wav')
-    ])
-
     this._introduction = new Introduction()
 
     this._floor = new Floor()
@@ -150,6 +126,8 @@ class App {
     })
 
     this._preRendering.scene.add(this._slicer.el)
+
+    this._sounds = new Sounds()
 
     this._hitCount = 0
 
@@ -231,7 +209,7 @@ class App {
     }
 
     if (PLAY_SOUNDS) {
-      this._sliceSound.play()
+      this._sounds.slice()
     }
 
     this._sliceDirection.copy(direction)
@@ -270,7 +248,7 @@ class App {
 
     if (this._hitCount < 2) {
       if (PLAY_SOUNDS) {
-        this._hitSound.play()
+        this._sounds.hit()
       }
       
       this._shakeCamera(5)
@@ -291,7 +269,7 @@ class App {
 
       if (!piece || !piece.active) {
         if (PLAY_SOUNDS) {
-          this._explodeSound.play()
+          this._sounds.explode()
         }
 
         this._shakeCamera(10, 0.3, 0.1)
@@ -312,13 +290,13 @@ class App {
     if (piece) {
       if (piece.active) {
         if (PLAY_SOUNDS) {
-          this._hitSound.play()
+          this._sounds.hit()
         }
         
         this._biscuit.bouncePiece(piece, point, this._sliceDirection)
       } else {
         if (PLAY_SOUNDS) {
-          this._breakSound.play()
+          this._sounds.break()
         }
 
         this._biscuit.removePiece(

@@ -2,8 +2,8 @@ import * as THREE from 'three'
 import * as CANNON from 'cannon'
 
 import Raycaster from '../../core/Raycaster'
-import { GET } from '../../core/ajax'
 import { random } from '../../core/math'
+import { fileLoader } from '../../core/Loaders'
 
 import BiscuitPiece from './BiscuitPiece'
 import Shadow from '../Shadow'
@@ -40,7 +40,7 @@ export default class Biscuit {
 
     this.pieces = []
 
-    new THREE.FileLoader().load(
+    fileLoader.load(
       require<string>('../../models/biscuit.json'),
       response => {
         const { pieces } = JSON.parse(response)
