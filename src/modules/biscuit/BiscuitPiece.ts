@@ -7,6 +7,7 @@ import {
 } from '../../core/shader'
 
 import Shadow from '../Shadow'
+import { vertexColorMaterial } from '../materials'
 
 const BODY_BOUNDING_BOX_REDUCTION = 0.5
 
@@ -29,39 +30,6 @@ interface BiscuitPieceData {
 }
 
 export default class BiscuitPiece {
-  private static _material = new THREE.RawShaderMaterial({
-    vertexShader: `
-    precision ${vertexShaderPrecision} float;
-
-    attribute vec3 position;
-    attribute vec3 color;
-
-    uniform mat4 projectionMatrix;
-    uniform mat4 modelViewMatrix;
-
-    varying vec3 vColor;
-
-    void main() {
-      vColor = color;
-
-      gl_Position = projectionMatrix * modelViewMatrix * vec4(position, 1.0);
-    }
-    `,
-    fragmentShader: `
-    precision ${fragmentShaderPrecision} float;
-
-    varying vec3 vColor;
-
-    void main() {
-      gl_FragColor = vec4(vColor, 1.0);
-    }
-    `,
-    uniforms: {
-      lightPosition: { type: 'v3', value: new THREE.Vector3(0.5, -1, 0) }
-    },
-    side: THREE.DoubleSide
-  })
-
   public el: THREE.Mesh
 
   public shadow: Shadow
@@ -100,7 +68,7 @@ export default class BiscuitPiece {
       new THREE.BufferAttribute(new Uint16Array(index.array), 1)
     )
 
-    this.el = new THREE.Mesh(geometry, BiscuitPiece._material)
+    this.el = new THREE.Mesh(geometry, vertexColorMaterial)
 
     const { shadowSize } = data
 

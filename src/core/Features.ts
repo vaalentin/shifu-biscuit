@@ -2,7 +2,6 @@ class Features {
   public supportsWebGL: boolean
   public supportsVsHighp: boolean
   public supportsFsHighp: boolean
-  public supportsDepthTexture: boolean
 
   constructor() {
     const $canvas = document.createElement('canvas')
@@ -14,16 +13,9 @@ class Features {
     if (this.supportsWebGL) {
       this.supportsVsHighp = this._supportsHighp(gl, gl.VERTEX_SHADER)
       this.supportsFsHighp = this._supportsHighp(gl, gl.FRAGMENT_SHADER)
-
-      const extensions = gl.getSupportedExtensions()
-
-      this.supportsDepthTexture =
-        extensions.indexOf('WEBGL_depth_texture') !== -1 ||
-        extensions.indexOf('WEBKIT_WEBGL_depth_texture') !== -1
     } else {
       this.supportsVsHighp = false
       this.supportsFsHighp = false
-      this.supportsDepthTexture = false
     }
   }
 

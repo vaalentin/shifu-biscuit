@@ -1,8 +1,6 @@
 import * as THREE from 'three'
 import * as CANNON from 'cannon'
 
-const ENABLE_HELPERS = false
-
 export default class Room {
   public leftWallBody: CANNON.Body
   public rightWallBody: CANNON.Body
@@ -38,21 +36,5 @@ export default class Room {
     this.floorBody = new CANNON.Body({ mass: 0 })
     this.floorBody.addShape(new CANNON.Plane())
     this.floorBody.quaternion.setFromAxisAngle(xAxis, -Math.PI / 2)
-
-    if (process.env.NODE_ENV === 'development' && ENABLE_HELPERS) {
-      const geometry = new THREE.PlaneBufferGeometry(sizeX, sizeZ, 1, 1)
-      const material = new THREE.MeshBasicMaterial({
-        color: 'blue',
-        wireframe: true,
-        depthTest: false,
-        depthWrite: false
-      })
-
-      this.debugEl = new THREE.Mesh(geometry, material)
-      this.debugEl.quaternion.setFromAxisAngle(
-        new THREE.Vector3(1, 0, 0),
-        -Math.PI / 2
-      )
-    }
   }
 }

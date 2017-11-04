@@ -7,7 +7,7 @@ import Signal from '../../core/Signal'
 import SlicerMesh from './SlicerMesh'
 import SlicerDebugger from './SlicerDebugger'
 
-const ENABLE_HELPERS = true
+const ENABLE_HELPERS = false
 
 interface SlicerSettings {
   pointsCount: number

@@ -1,3 +1,5 @@
+import { TweenMax } from 'gsap'
+
 import { fileLoader } from './Loaders'
 
 export default class SoundPlayer {
@@ -5,9 +7,12 @@ export default class SoundPlayer {
 
   private _audio: HTMLAudioElement
 
-  constructor(srcs: string[]) {
+  private _preload: boolean
+
+  constructor(srcs: string[], preload = true, loop = false) {
     this._audio = new Audio()
     this._audio.playbackRate = 0.1
+    this._audio.loop = loop
 
     // see https://github.com/goldfire/howler.js/blob/master/src/howler.core.js#L246-L267
     if (!SoundPlayer._supportedTypes) {
@@ -44,10 +49,16 @@ export default class SoundPlayer {
       const extension = src.split('.').pop()
 
       if (SoundPlayer._supportedTypes[extension]) {
-        fileLoader.load(src, () => {
+        if (this._preload) {
+          fileLoader.load(src, () => {
+            this._audio.setAttribute('src', src)
+            this._audio.load()
+          })
+        }
+        else {
           this._audio.setAttribute('src', src)
           this._audio.load()
-        })
+        }
         
         return
       }
@@ -56,5 +67,11 @@ export default class SoundPlayer {
 
   public play() {
     this._audio.play()
+  }
+
+  public fadeOut(duration: number) {
+    TweenMax.to(this._audio, duration, {
+      volume: 0
+    } as any)
   }
 }

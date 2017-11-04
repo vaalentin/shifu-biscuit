@@ -25,4 +25,13 @@ interface Process {
 
 declare const process: Process
 
-interface Window {}
+interface Window {
+  ga(
+    send: string,
+    type: string,
+    category: string,
+    action: string,
+    label?: string,
+    value?: number
+  )
+}

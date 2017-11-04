@@ -5,6 +5,15 @@
   <title>Shifu Biscuit</title>
   <meta name="viewport" content="width=device-width, initial-scale=1">
 
+  <script async src="https://www.googletagmanager.com/gtag/js?id=UA-96215339-2"></script>
+  <script>
+    window.dataLayer = window.dataLayer || [];
+    function gtag(){dataLayer.push(arguments);}
+    gtag('js', new Date());
+  
+    gtag('config', 'UA-96215339-2');
+  </script>
+
   <style type="text/css">
     <%= require('./index.css?inline') %>
   </style>
@@ -112,6 +121,10 @@
     <button class="introduction__button">Press to start</button>
 
   </div>
+
+  <footer class="footer">
+    <a class="footer__link" href="#">Made by the one and only Jean Val Jean</a>
+  </footer>
 
   <script type="text/javascript">
     <%= require('./index.js?inline') %>

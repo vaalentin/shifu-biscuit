@@ -1,0 +1,22 @@
+.text {
+  font-family: 'Tauri', sans-serif;
+  letter-spacing: .2em;
+  line-height: 1.6rem;
+  font-size: 1rem;
+
+  color: #fff;
+
+  margin-top: -3rem;
+}
+
+.word {
+  white-space: nowrap;
+}
+
+.letter {
+  display: inline-block;
+  
+  opacity: 0;
+
+  will-change: opacity, transform;
+}

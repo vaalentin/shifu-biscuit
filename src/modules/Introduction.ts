@@ -12,6 +12,8 @@ export default class Introduction {
 
   private _scale: number
 
+  private _isClosing: boolean
+
   public onStart: Signal<void>
 
   constructor() {
@@ -22,6 +24,8 @@ export default class Introduction {
     this._$button = this._$el.querySelector('.introduction__button') as HTMLElement
 
     this._scale = 0
+
+    this._isClosing = false
 
     this.onStart = new Signal<void>()
 
@@ -92,6 +96,10 @@ export default class Introduction {
   }
 
   private _handleButtonMouseEnter() {
+    if (this._isClosing) {
+      return
+    }
+
     TweenMax.to(this._$button, 0.3, {
       scale: 0.9,
       ease: Expo.easeOut
@@ -99,6 +107,10 @@ export default class Introduction {
   }
 
   private _handleButtonMouseLeave() {
+    if (this._isClosing) {
+      return
+    }
+
     TweenMax.to(this._$button, 0.3, {
       scale: 1,
       ease: Expo.easeOut
@@ -106,7 +118,24 @@ export default class Introduction {
   }
 
   private _handleButtonClick() {
-    this.onStart.dispatch() 
+    if (this._isClosing) {
+      return
+    }
+
+    TweenMax.to(this._$button, 0.1, {
+      scale: 1.1
+    } as any)
+
+    TweenMax.to(this._$button, 0.1, {
+      scale: 0.9,
+      delay: 0.1
+    } as any)
+
+    TweenMax.delayedCall(0.2, () => {
+      this.onStart.dispatch()
+    })
+    
+    this._isClosing = true
   }
 
   private _updateRects() {
@@ -155,7 +184,6 @@ export default class Introduction {
     TweenMax.to(this._$el, 1, {
       opacity: 0,
       scale: 0.8,
-      ease: Expo.easeOut,
       onComplete: this.dispose.bind(this)
     } as any)
   }

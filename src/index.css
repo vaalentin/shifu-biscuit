@@ -24,6 +24,11 @@
 }
 
 /** General **/
+html, body {
+  width: 100%;
+  height: 100%;
+}
+
 body {
   overflow: hidden;
   
@@ -31,6 +36,8 @@ body {
   padding: 0;
 
   background-color: #8080ff;
+
+  perspective: 500px;
 }
 
 ::selection {
@@ -270,3 +277,4 @@ body {
     font-size: 0.7rem;
   }
 }
+
