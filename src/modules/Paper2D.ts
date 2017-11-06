@@ -1,7 +1,6 @@
 import * as THREE from 'three'
 import { TweenMax, Elastic, Expo } from 'gsap'
 
-import Cookies from '../core/Cookies'
 import { random } from '../core/math'
 import Signal from '../core/Signal'
 
@@ -53,7 +52,6 @@ export default class Paper2D {
     this._parentSize = new THREE.Vector2(width, height)
     this._position = new THREE.Vector2(0, 0)
 
-    // if (!parseInt(Cookies.get('count'))) {
     if (true) {
       this._animatedText = new AnimatedText('Tap anywhere to keep on smashing the biscuit')
       this._animatedText.$el.classList.add(styles.instructions)

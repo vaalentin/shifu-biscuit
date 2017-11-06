@@ -6,7 +6,6 @@ import { TweenMax, TimelineMax } from 'gsap'
 
 import Raycaster from './core/Raycaster'
 import { fileLoader } from './core/Loaders'
-import Cookies from './core/Cookies'
 import { map, random } from './core/math'
 
 import { vertexColorMaterial } from './modules/materials'
@@ -319,16 +318,6 @@ class App {
           this._preRendering.scene,
           this._raycaster
         )
-
-        let count = parseInt(Cookies.get('count'))
-
-        if (!count) {
-          count = 0
-        }
-        
-        count++
-
-        Cookies.add('count', count.toString(), 30)
 
         this._showPaper()
 
