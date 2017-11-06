@@ -17,7 +17,7 @@ class Sounds {
   constructor() {
     this._background = new SoundPlayer([
       require<string>('../sounds/background.mp3'),
-      require<string>('../sounds/background.wav'),
+      require<string>('../sounds/background.ogg'),
       require<string>('../sounds/background.webm')
     ], false, true)
 
