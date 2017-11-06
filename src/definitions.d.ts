@@ -33,6 +33,7 @@ declare interface PaletteColor {
 declare interface Palette {
   background: PaletteColor
   highlight: PaletteColor
+  extras: PaletteColor[]
 }
 
 interface Window {

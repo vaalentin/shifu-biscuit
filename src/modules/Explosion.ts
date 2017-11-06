@@ -60,13 +60,10 @@ export default class Explosion {
   private static _geometry: THREE.BufferGeometry
 
   private static _colors = [
-    [233 / 255, 209 / 255, 178 / 255],
-    [151 / 255, 102 / 255, 41 / 255],
-    [208 / 255, 151 / 255, 77 / 255],
-    [1, 0.5, 0],
-    [0, 1, 0.5],
-    [1, 0, 0.5]
-  ]
+    [233, 209, 178],
+    [151, 102, 41],
+    [208, 151, 77]
+  ].concat(window.palette.extras.map(color => color.rgb))
 
   public el: THREE.Object3D
 
@@ -118,9 +115,13 @@ export default class Explosion {
 
       const material = Explosion._material.clone()
 
-      const [r, g, b] = Explosion._colors[
+      let [r, g, b] = Explosion._colors[
         Math.floor(Math.random() * Explosion._colors.length)
       ]
+      
+      r /= 255
+      g /= 255
+      b /= 255
 
       material.uniforms.color.value.set(r, g, b)
 

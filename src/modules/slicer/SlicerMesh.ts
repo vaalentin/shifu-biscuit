@@ -87,13 +87,13 @@ export default class SlicerMesh {
   public setRandomColor() {
     const value = Math.random()
 
-    if (value < 0.33) {
-      SlicerMesh._material.uniforms.fromColor.value.set(1, 0.5, 0)
-    } else if (value < 0.66) {
-      SlicerMesh._material.uniforms.fromColor.value.set(0, 1, 0.5)
-    } else {
-      SlicerMesh._material.uniforms.fromColor.value.set(1, 0, 0.5)
-    }
+    let [r, g, b] = window.palette.extras[Math.floor(Math.random() * window.palette.extras.length)].rgb
+
+    r /= 255
+    g /= 255
+    b /= 255
+
+    SlicerMesh._material.uniforms.fromColor.value.set(r, g, b)
   }
 
   public setDrawCount(count: number) {

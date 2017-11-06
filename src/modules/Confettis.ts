@@ -85,14 +85,12 @@ export default class Confettis {
     depthTest: true
   })
 
+  
   private static _confettisColors = [
-    [233 / 255, 209 / 255, 178 / 255],
-    [151 / 255, 102 / 255, 41 / 255],
-    [208 / 255, 151 / 255, 77 / 255],
-    [1, 0.5, 0],
-    [0, 1, 0.5],
-    [1, 0, 0.5]
-  ]
+    [233, 209, 178],
+    [151, 102, 41],
+    [208, 151, 77]
+  ].concat(window.palette.extras.map(color => color.rgb))
 
   public confettis: THREE.Points
 
@@ -126,9 +124,13 @@ export default class Confettis {
 
       confettisLifeSpans[j] = 0
 
-      const [r, g, b] = Confettis._confettisColors[
+      let [r, g, b] = Confettis._confettisColors[
         Math.floor(Math.random() * Confettis._confettisColors.length)
       ]
+
+      r /= 255
+      g /= 255
+      b /= 255
 
       confettisColors[i] = r
       confettisColors[i + 1] = g
