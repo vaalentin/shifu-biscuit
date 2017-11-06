@@ -23,6 +23,9 @@ import Slicer from './modules/slicer/Slicer'
 import Sounds from './modules/Sounds'
 import Smoke from './modules/Smoke'
 
+require<string>('./images/facebook.png?uncached')
+require<string>('./images/twitter.png?uncached')
+
 const SKIP_INTRODUCTION = false
 const PLAY_SOUNDS = true
 const STRAIGHT_TO_PAPER = false

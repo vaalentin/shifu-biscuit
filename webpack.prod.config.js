@@ -89,7 +89,25 @@ module.exports = {
           }
         ]
       },
-      { test: /\.png$/, use: 'file-loader' },
+      {
+        test: /\.png$/,
+        oneOf: [
+          {
+            resourceQuery: /uncached/,
+            use: [
+              {
+                loader: 'file-loader',
+                options: {
+                  name: '[name].[ext]'
+                }
+              },
+            ]
+          },
+          {
+            use: 'file-loader'
+          }
+        ]
+      },
       { test: /\.(mp3|wav|webm)$/, use: 'file-loader' },
       { test: /\.(eot|woff2|woff|ttf|svg)$/, use: 'file-loader' }
     ]
