@@ -304,7 +304,7 @@ class App {
           Sounds.explode()
         }
 
-        this._shakeCamera(10, 0.2, 0.2, 0.05, 0, 200)
+        this._shakeCamera(10, 0.2, 0.2, 0.05, 0, 200, 1, 1)
 
         this._explosion.explode(point)
         this._smoke.explode(point)
@@ -392,7 +392,7 @@ class App {
     this._isActive = true
   }
 
-  private _shakeCamera(steps: number = 20, amplitudeX = 0.1, amplitudeZ = 0.01, duration = 0.05, endBlur = 0, endRgbShift = 0) {
+  private _shakeCamera(steps: number = 20, amplitudeX = 0.1, amplitudeZ = 0.01, duration = 0.05, endBlur = 0, endRgbShift = 0, blurStrength = 1, rgbShiftStrength = 0.2) {
     const timeline = new TimelineMax({
       onComplete: () => {
         this._preRendering.camera.lookAt(new THREE.Vector3(0, 0, 0))
@@ -416,11 +416,11 @@ class App {
       }, time)
 
       timeline.to(this, d, {
-        _blurAmmount: random(2, 4)
+        _blurAmmount: random(2, 4) * blurStrength
       }, time)
 
       timeline.to(this, d, {
-        _rgbShiftAmmount: random(200, 500)
+        _rgbShiftAmmount: random(200, 500) * rgbShiftStrength
       }, time)
 
       time += d
