@@ -84,7 +84,8 @@ class App {
     document.body.appendChild(this._renderer.domElement)
 
     this._preRendering = new PreRendering(width, height)
-    this._preRendering.camera.position.set(0, 2, 2)
+    const cameraPosition = map(width / height, 0.5, 1, 4, 2)
+    this._preRendering.camera.position.set(0, cameraPosition, cameraPosition)
     this._preRendering.camera.userData.lookAt = new THREE.Vector3(0, 0, 0)
     this._preRendering.camera.lookAt(this._preRendering.camera.userData.lookAt)
 
@@ -117,6 +118,10 @@ class App {
     this._confettis = new Confettis(200)
     this._preRendering.scene.add(this._confettis.confettis)
     this._preRendering.scene.add(this._confettis.shadows)
+
+    const confettisSize = map(width / height, 0.5, 1, 0.5, 1)
+    this._confettis.confettisMaterial.uniforms.sizeAttenuation.value = confettisSize
+    this._confettis.shadowsMaterial.uniforms.sizeAttenuation.value = confettisSize
 
     this._explosion = new Explosion()
     this._preRendering.scene.add(this._explosion.el)
@@ -220,7 +225,16 @@ class App {
   }
 
   private _handleResize() {
-    const { innerWidth: width, innerHeight: height } = window
+    const { innerWidth: width, innerHeight: height } = window 
+
+    const cameraPosition = map(width / height, 0.5, 1, 4, 2)
+    this._preRendering.camera.position.y = cameraPosition
+    this._preRendering.camera.position.z = cameraPosition
+    this._preRendering.camera.lookAt(new THREE.Vector3(0, 0, 0))
+
+    const confettisSize = map(width / height, 0.5, 1, 0.5, 1)
+    this._confettis.confettisMaterial.uniforms.sizeAttenuation.value = confettisSize
+    this._confettis.shadowsMaterial.uniforms.sizeAttenuation.value = confettisSize
 
     this._renderer.setSize(width, height)
 

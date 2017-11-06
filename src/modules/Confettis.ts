@@ -12,6 +12,7 @@ export default class Confettis {
     attribute float lifeSpan;
     attribute vec3 color;
     attribute float scale;
+    uniform float sizeAttenuation;
 
     uniform mat4 projectionMatrix;
     uniform mat4 modelViewMatrix;
@@ -23,7 +24,7 @@ export default class Confettis {
       vLifeSpan = lifeSpan;
       vColor = color;
 
-      gl_PointSize = lifeSpan * scale;
+      gl_PointSize = (lifeSpan * scale) * sizeAttenuation;
       gl_Position = projectionMatrix * modelViewMatrix * vec4(position, 1.0);
     }
     `,
@@ -41,6 +42,9 @@ export default class Confettis {
       gl_FragColor = vec4(vColor, alpha);
     }
     `,
+    uniforms: {
+      sizeAttenuation: { type: 'f', value: 1 }
+    },
     transparent: true,
     depthWrite: false
   })
@@ -56,13 +60,14 @@ export default class Confettis {
 
     uniform mat4 projectionMatrix;
     uniform mat4 modelViewMatrix;
+    uniform float sizeAttenuation;
 
     varying float vInfluence;
 
     void main() {
       vInfluence = influence;
 
-      gl_PointSize = (scale * 2.0) * lifeSpan;
+      gl_PointSize = ((scale * 2.0) * lifeSpan) * sizeAttenuation;
       gl_Position = projectionMatrix * modelViewMatrix * vec4(position, 1.0);
     }
     `,
@@ -80,6 +85,9 @@ export default class Confettis {
       gl_FragColor = vec4(vec3(0.0), alpha * vInfluence * 0.1);
     }
     `,
+    uniforms: {
+      sizeAttenuation: { type: 'f', value: 1 }
+    },
     transparent: true,
     depthWrite: false,
     depthTest: true
@@ -91,6 +99,9 @@ export default class Confettis {
     [151, 102, 41],
     [208, 151, 77]
   ].concat(window.palette.extras.map(color => color.rgb))
+
+  public confettisMaterial: THREE.RawShaderMaterial
+  public shadowsMaterial: THREE.RawShaderMaterial
 
   public confettis: THREE.Points
 
@@ -165,10 +176,12 @@ export default class Confettis {
       new THREE.BufferAttribute(this._confettisScales, 1)
     )
 
+    this.confettisMaterial = Confettis._confettiMaterial
+
     // confettis
     this.confettis = new THREE.Points(
       confettisGeometry,
-      Confettis._confettiMaterial
+      this.confettisMaterial
     )
     this.confettis.visible = false
 
@@ -199,8 +212,10 @@ export default class Confettis {
       (confettisGeometry.attributes as any).scale
     )
 
+    this.shadowsMaterial = Confettis._shadowMaterial
+
     // shadows
-    this.shadows = new THREE.Points(shadowsGeometry, Confettis._shadowMaterial)
+    this.shadows = new THREE.Points(shadowsGeometry, this.shadowsMaterial)
     this.shadows.visible = false
 
     this.active = false
