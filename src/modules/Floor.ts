@@ -8,26 +8,21 @@ export default class Floor {
   constructor() {
     const geometry = new THREE.PlaneBufferGeometry(10, 10)
 
-    geometry.addAttribute(
-      'color',
-      new THREE.BufferAttribute(
-        new Float32Array([
-          0.5,
-          0.5,
-          1.0,
-          0.5,
-          0.5,
-          1.0,
-          0.5,
-          0.5,
-          1.0,
-          0.5,
-          0.5,
-          1.0
-        ]),
-        3
-      )
-    )
+    const colors = new Float32Array(4 * 3)
+
+    let [r, g, b] = window.palette.background.rgb
+
+    r /= 255
+    g /= 255
+    b /= 255
+
+    for (let i = 0; i < colors.length; i += 3) {
+      colors[i] = r
+      colors[i + 1] = g
+      colors[i + 2] = b
+    }
+
+    geometry.addAttribute('color', new THREE.BufferAttribute(colors, 3))
 
     this.el = new THREE.Mesh(geometry, vertexColorMaterial)
 

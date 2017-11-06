@@ -25,6 +25,16 @@ interface Process {
 
 declare const process: Process
 
+declare interface PaletteColor {
+  hex: string
+  rgb: [number, number, number]
+}
+
+declare interface Palette {
+  background: PaletteColor
+  highlight: PaletteColor
+}
+
 interface Window {
   ga(
     send: string,
@@ -34,4 +44,6 @@ interface Window {
     label?: string,
     value?: number
   )
+
+  palette: Palette
 }

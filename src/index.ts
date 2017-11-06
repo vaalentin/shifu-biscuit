@@ -78,7 +78,7 @@ class App {
 
     this._renderer.autoClear = false
 
-    this._renderer.setClearColor('#8080ff', 1 );
+    this._renderer.setClearColor(window.palette.background.hex, 1);
 
     this._renderer.setPixelRatio(window.devicePixelRatio || 1)
     this._renderer.setSize(width, height)

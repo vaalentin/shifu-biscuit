@@ -35,8 +35,6 @@ body {
   margin: 0;
   padding: 0;
 
-  background-color: #8080ff;
-
   perspective: 500px;
 }
 
@@ -111,7 +109,6 @@ body {
 }
 
 .title__rect--background {
-  fill: #7070f7;
 }
 
 .title__text--transparent {
@@ -227,7 +224,6 @@ body {
   border: 2px solid #fff;
   border: none;
   background: transparent;
-  background: #7070f7;
 
   padding: 1rem;
 
