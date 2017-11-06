@@ -6,7 +6,7 @@ export default class Floor {
   public el: THREE.Mesh
 
   constructor() {
-    const geometry = new THREE.PlaneBufferGeometry(10, 10)
+    const geometry = new THREE.PlaneBufferGeometry(20, 20)
 
     const colors = new Float32Array(4 * 3)
 
