@@ -8,8 +8,6 @@ export default class Room {
   public backWallBody: CANNON.Body
   public floorBody: CANNON.Body
 
-  public debugEl: THREE.Mesh
-
   constructor(sizeX = 2, sizeZ = 2) {
     const yAxis = new CANNON.Vec3(0, 1, 0)
     const xAxis = new CANNON.Vec3(1, 0, 0)
