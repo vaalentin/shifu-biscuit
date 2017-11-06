@@ -103,7 +103,7 @@ module.exports = {
           }
         ]
       },
-      { test: /\.(mp3|wav|webm)$/, use: 'file-loader' },
+      { test: /\.(mp3|wav|webm|ogg)$/, use: 'file-loader' },
       { test: /\.(eot|woff2|woff|ttf|svg)$/, use: 'file-loader' }
     ]
   },
