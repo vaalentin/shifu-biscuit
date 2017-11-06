@@ -87,7 +87,7 @@ class App {
     document.body.appendChild(this._renderer.domElement)
 
     this._preRendering = new PreRendering(width, height)
-    const cameraPosition = map(width / height, 0.5, 1, 4, 2)
+    const cameraPosition = map(width / height, 0.5, 1, 5, 2)
     this._preRendering.camera.position.set(0, cameraPosition, cameraPosition)
     this._preRendering.camera.userData.lookAt = new THREE.Vector3(0, 0, 0)
     this._preRendering.camera.lookAt(this._preRendering.camera.userData.lookAt)
@@ -230,7 +230,7 @@ class App {
   private _handleResize() {
     const { innerWidth: width, innerHeight: height } = window 
 
-    const cameraPosition = map(width / height, 0.5, 1, 4, 2)
+    const cameraPosition = map(width / height, 0.5, 1, 5, 2)
     this._preRendering.camera.position.y = cameraPosition
     this._preRendering.camera.position.z = cameraPosition
     this._preRendering.camera.lookAt(new THREE.Vector3(0, 0, 0))
