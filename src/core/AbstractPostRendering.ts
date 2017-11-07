@@ -39,5 +39,5 @@ export default abstract class AbstractPostRendering {
     }
   }
 
-  public abstract render(renderer: THREE.WebGLRenderer, ...any);
+  public abstract render(renderer: THREE.WebGLRenderer, ...any)
 }

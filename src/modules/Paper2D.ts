@@ -54,7 +54,7 @@ export default class Paper2D {
     this._$el.appendChild(this.animatedText.$el)
   }
 
-  public setQuote(quote: { text: string, author: string }) {
+  public setQuote(quote: { text: string; author: string }) {
     const $text = document.createElement('div')
     $text.classList.add(styles.text)
     $text.innerText = quote.text
@@ -87,14 +87,17 @@ export default class Paper2D {
 
   public resize(width: number, height: number) {
     this._parentSize.set(width, height)
-    
+
     this._needsUpdate = true
   }
 
   public show(originX: number, originY: number, angle: number) {
     this._isActive = true
 
-    TweenMax.delayedCall(0.5, this.animatedText.animateIn.bind(this.animatedText))
+    TweenMax.delayedCall(
+      0.5,
+      this.animatedText.animateIn.bind(this.animatedText)
+    )
 
     document.body.appendChild(this._$el)
 
@@ -103,7 +106,7 @@ export default class Paper2D {
     TweenMax.to(this._position, 3, {
       x: 0.5,
       y: 0.5,
-      onUpdate: () => this._needsUpdate = true,
+      onUpdate: () => (this._needsUpdate = true),
       ease: Elastic.easeOut.config(1, 0.5)
     } as any)
 

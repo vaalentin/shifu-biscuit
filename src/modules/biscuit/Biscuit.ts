@@ -40,19 +40,16 @@ export default class Biscuit {
 
     this.pieces = []
 
-    fileLoader.load(
-      require<string>('../../models/biscuit.json'),
-      response => {
-        const { pieces } = JSON.parse(response)
+    fileLoader.load(require<string>('../../models/biscuit.json'), response => {
+      const { pieces } = JSON.parse(response)
 
-        for (let i = 0; i < pieces.length; ++i) {
-          const piece = new BiscuitPiece(pieces[i])
-          this.el.add(piece.el)
-          this.body.addShape(piece.boxShape, piece.boxShapeCenter)
-          this.pieces.push(piece)
-        }
+      for (let i = 0; i < pieces.length; ++i) {
+        const piece = new BiscuitPiece(pieces[i])
+        this.el.add(piece.el)
+        this.body.addShape(piece.boxShape, piece.boxShapeCenter)
+        this.pieces.push(piece)
       }
-    )
+    })
 
     this.active = true
   }

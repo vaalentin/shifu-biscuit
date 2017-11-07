@@ -50,7 +50,7 @@ export default class Explosion {
     uniforms: {
       color: { type: 'v3', value: new THREE.Vector3(1, 1, 1) },
       size: { type: 'f', value: 1 },
-      scale: { type: 'f', value: 1}
+      scale: { type: 'f', value: 1 }
     },
     depthTest: false,
     depthWrite: false,
@@ -87,7 +87,7 @@ export default class Explosion {
       for (let i = 1; i < stepsX - 1; i++) {
         const x = map(i, 0, stepsX - 1, 0, 1)
 
-        const j = map(i, 0, stepsX -1, -0.6, 1)
+        const j = map(i, 0, stepsX - 1, -0.6, 1)
 
         const h = (1 - Math.pow(Math.abs(j), 2)) * 0.1
 
@@ -104,8 +104,14 @@ export default class Explosion {
       uvs.push(1, 0.5)
 
       Explosion._geometry = new THREE.BufferGeometry()
-      Explosion._geometry.addAttribute('position', new THREE.BufferAttribute(new Float32Array(positions), 3))
-      Explosion._geometry.addAttribute('uv', new THREE.BufferAttribute(new Float32Array(uvs), 2))
+      Explosion._geometry.addAttribute(
+        'position',
+        new THREE.BufferAttribute(new Float32Array(positions), 3)
+      )
+      Explosion._geometry.addAttribute(
+        'uv',
+        new THREE.BufferAttribute(new Float32Array(uvs), 2)
+      )
     }
 
     this._materials = []
@@ -118,7 +124,7 @@ export default class Explosion {
       let [r, g, b] = Explosion._colors[
         Math.floor(Math.random() * Explosion._colors.length)
       ]
-      
+
       r /= 255
       g /= 255
       b /= 255
@@ -133,7 +139,7 @@ export default class Explosion {
 
       const scale = random(0.5, 3)
       mesh.scale.set(scale, scale, 2)
-      
+
       const parent = new THREE.Object3D()
       parent.rotation.z = angle + random(-0.3, 0.3)
 
@@ -146,18 +152,23 @@ export default class Explosion {
   public explode(origin: THREE.Vector3, strength = 1) {
     this.el.visible = true
 
-    this.el.position.copy(origin) 
+    this.el.position.copy(origin)
 
     const timeline = new TimelineMax({
-      onComplete: () => this.el.visible = false
+      onComplete: () => (this.el.visible = false)
     })
 
-    timeline.to(this.el.scale, 0.5, {
-      x: 2 * strength, 
-      y: 2 * strength,
-      z: 2 * strength,
-      ease: Expo.easeOut
-    }, 0)
+    timeline.to(
+      this.el.scale,
+      0.5,
+      {
+        x: 2 * strength,
+        y: 2 * strength,
+        z: 2 * strength,
+        ease: Expo.easeOut
+      },
+      0
+    )
 
     for (let i = 0; i < this._materials.length; i++) {
       this._materials[i].uniforms.size.value = 1
@@ -165,14 +176,24 @@ export default class Explosion {
 
       const delay = random(0, 0.2)
 
-      timeline.to(this._materials[i].uniforms.size, 0.25, {
-        value: 0,
-        ease: Expo.easeOut
-      }, delay)
+      timeline.to(
+        this._materials[i].uniforms.size,
+        0.25,
+        {
+          value: 0,
+          ease: Expo.easeOut
+        },
+        delay
+      )
 
-      timeline.to(this._materials[i].uniforms.scale, 0.25, {
-        value: 0
-      }, delay + 0.1)
+      timeline.to(
+        this._materials[i].uniforms.scale,
+        0.25,
+        {
+          value: 0
+        },
+        delay + 0.1
+      )
     }
   }
 }

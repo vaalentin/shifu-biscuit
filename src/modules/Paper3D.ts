@@ -104,16 +104,16 @@ export default class Paper3D {
 
     const directions = new Float32Array(100 * 3)
     const positions = new Float32Array(100 * 3)
-    
+
     for (let i = 0; i < positions.length; i += 3) {
       let directionX = random(-1, 1)
       let directionY = random(-1, 1)
       let directionZ = random(-1, 1)
 
       const directionLength = Math.sqrt(
-        (directionX * directionX)
-        + (directionY * directionY)
-        + (directionZ * directionZ)
+        directionX * directionX +
+          directionY * directionY +
+          directionZ * directionZ
       )
 
       directions[i] = directionX / directionLength
@@ -130,7 +130,10 @@ export default class Paper3D {
     const particlesGeometry = new THREE.BufferGeometry()
     particlesGeometry.addAttribute('position', particlesPositions)
 
-    const particles = new THREE.Points(particlesGeometry, Paper3D._particlesMaterial)
+    const particles = new THREE.Points(
+      particlesGeometry,
+      Paper3D._particlesMaterial
+    )
 
     setInterval(() => {
       const positions = particlesPositions.array as number[]
@@ -146,7 +149,6 @@ export default class Paper3D {
 
     // this.el.add(particles)
 
-
     // const gui = new GUI()
     // gui.add(this._material.uniforms.bend, 'value').min(-1).max(1).name('bend')
   }
@@ -158,7 +160,8 @@ export default class Paper3D {
     const lineHeight = 64
     const maxCharactersPerLine = 60
 
-    const lines = text.split('\n')
+    const lines = text
+      .split('\n')
       .map(line => line.trim())
       .reduce((out, line) => {
         const lines = []
@@ -177,33 +180,36 @@ export default class Paper3D {
 
     const linesCount = lines.length + (author ? 1 : 0)
 
-   
-
     const $canvas = document.createElement('canvas')
 
     this.el.scale.y = 0.1 * linesCount
 
     $canvas.width = 1024
-    $canvas.height = (lineHeight * 1.1) * (linesCount)
+    $canvas.height = lineHeight * 1.1 * linesCount
 
     const ctx = $canvas.getContext('2d')
 
     ctx.fillStyle = '#fff'
     ctx.fillRect(0, 0, $canvas.width, $canvas.height)
 
-    ctx.font = `${lineHeight}px serif`;
+    ctx.font = `${lineHeight}px serif`
     ctx.textAlign = 'center'
     ctx.textBaseline = 'top'
     ctx.fillStyle = '#000'
 
     for (let i = 0; i < lines.length; i++) {
-      ctx.fillText(lines[i], $canvas.width / 2, lineHeight * (i), $canvas.width - 50);
+      ctx.fillText(
+        lines[i],
+        $canvas.width / 2,
+        lineHeight * i,
+        $canvas.width - 50
+      )
     }
 
     // if (author) {
     //   ctx.font = '18px serif'
     //   ctx.textAlign = 'right'
-      
+
     //   ctx.fillText(author, $canvas.width -50, 32 * (linesCount), $canvas.width - 50)
     // }
 
@@ -214,8 +220,11 @@ export default class Paper3D {
     return texture
   }
 
-  public setQuote(quote: { text: string, author: string}) {
-    this._paperMaterial.uniforms.texture.value = this._getTexture(quote.text, quote.author)
+  public setQuote(quote: { text: string; author: string }) {
+    this._paperMaterial.uniforms.texture.value = this._getTexture(
+      quote.text,
+      quote.author
+    )
   }
 
   public update(delta: number) {

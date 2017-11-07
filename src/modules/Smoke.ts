@@ -59,7 +59,7 @@ export default class Smoke {
     if (!this.el.visible) {
       return
     }
-    
+
     this._sprite.update(delta)
   }
 
@@ -71,7 +71,7 @@ export default class Smoke {
     for (let i = 0; i < this._planes.length; i++) {
       const plane = this._planes[i]
       const scale = this._scales[i]
-      
+
       TweenMax.to(plane.scale, 2, {
         x: scale,
         y: scale,
@@ -82,7 +82,7 @@ export default class Smoke {
 
     TweenMax.to(this._sprite.material.uniforms.alpha, 2, {
       value: 0,
-      onComplete: () => this.el.visible = false
+      onComplete: () => (this.el.visible = false)
     } as any)
   }
 }

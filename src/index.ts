@@ -39,7 +39,7 @@ class App {
   private _$about: HTMLElement
 
   private _world: CANNON.World
-  
+
   private _renderer: THREE.WebGLRenderer
 
   private _preRendering: PreRendering
@@ -94,7 +94,7 @@ class App {
 
     this._renderer.autoClear = false
 
-    this._renderer.setClearColor(window.palette.background.hex, 1);
+    this._renderer.setClearColor(window.palette.background.hex, 1)
 
     this._renderer.setPixelRatio(window.devicePixelRatio || 1)
     this._renderer.setSize(width, height)
@@ -123,7 +123,7 @@ class App {
     this._world.addBody(this._room.rightWallBody)
     this._world.addBody(this._room.backWallBody)
     this._world.addBody(this._room.frontWallBody)
-    
+
     this._biscuit = new Biscuit()
     this._preRendering.scene.add(this._biscuit.el)
     this._preRendering.scene.add(this._biscuit.shadow.el)
@@ -159,7 +159,11 @@ class App {
     this._about = new About()
     document.body.appendChild(this._about.$el)
 
-    this._paperButton = new AnimatedText('Show me my quote!', [], ['header__button'])
+    this._paperButton = new AnimatedText(
+      'Show me my quote!',
+      [],
+      ['header__button']
+    )
     TweenMax.set(this._paperButton.$el, { display: 'none' })
     document.body.appendChild(this._paperButton.$el)
 
@@ -237,7 +241,10 @@ class App {
     this._slicer.onSliceEnd.add(this._handleSliceEnd)
     this._raycaster.onCast.add(this._handleRaycast)
     THREE.DefaultLoadingManager.onProgress = this._handleLoadProgress
-    this._paper.animatedText.$el.addEventListener('click', this._handlePaperClose)
+    this._paper.animatedText.$el.addEventListener(
+      'click',
+      this._handlePaperClose
+    )
   }
 
   private _handleLoadProgress(url: number, loaded: number, total: number) {
@@ -246,10 +253,9 @@ class App {
     }
 
     TweenMax.delayedCall(2, () => {
-      const onComplete = loaded === total
-        ? this._handleLoadComplete.bind(this)
-        : null
-        
+      const onComplete =
+        loaded === total ? this._handleLoadComplete.bind(this) : null
+
       this._introduction.setProgress(loaded / total, onComplete)
     })
   }
@@ -267,7 +273,7 @@ class App {
   }
 
   private _handleResize() {
-    const { innerWidth: width, innerHeight: height } = window 
+    const { innerWidth: width, innerHeight: height } = window
 
     const cameraPosition = map(width / height, 0.5, 1, 5, 2)
     this._preRendering.camera.position.y = cameraPosition
@@ -337,7 +343,7 @@ class App {
       if (PLAY_SOUNDS) {
         Sounds.hit()
       }
-      
+
       this._shakeCamera(10)
 
       this._biscuit.bounce(point, this._sliceDirection)
@@ -366,7 +372,7 @@ class App {
         Sounds.fadeOutBackground()
 
         this._isBiscuitExploded = true
-        
+
         TweenMax.to(this, 1, {
           _rgbShiftAmmount: 300
         } as any)
@@ -383,16 +389,15 @@ class App {
           const piece = this._biscuit.pieces[i]
 
           piece.body.applyForce(
+            new CANNON.Vec3(random(-1000, 1000), -500, random(-1000, 1000)),
             new CANNON.Vec3(
-              random(-1000, 1000),
-              -500,
-              random(-1000, 1000)
-            ),
-            new CANNON.Vec3(piece.el.position.x, piece.el.position.y, piece.el.position.z)
+              piece.el.position.x,
+              piece.el.position.y,
+              piece.el.position.z
+            )
           )
         }
-      }
-      else {
+      } else {
         this._shakeCamera(10)
       }
     }
@@ -402,7 +407,7 @@ class App {
         if (PLAY_SOUNDS) {
           Sounds.hit()
         }
-        
+
         this._biscuit.bouncePiece(piece, point, this._sliceDirection)
       } else {
         if (PLAY_SOUNDS) {
@@ -427,13 +432,22 @@ class App {
     })
   }
 
-  private _shakeCamera(steps: number = 20, amplitudeX = 0.1, amplitudeZ = 0.01, duration = 0.05, endBlur = 0, endRgbShift = 0, blurStrength = 1, rgbShiftStrength = 0.2) {
+  private _shakeCamera(
+    steps: number = 20,
+    amplitudeX = 0.1,
+    amplitudeZ = 0.01,
+    duration = 0.05,
+    endBlur = 0,
+    endRgbShift = 0,
+    blurStrength = 1,
+    rgbShiftStrength = 0.2
+  ) {
     const timeline = new TimelineMax({
       onComplete: () => {
         this._preRendering.camera.lookAt(new THREE.Vector3(0, 0, 0))
 
         this._blurAmmount = endBlur
-        
+
         this._rgbShiftAmmount = endRgbShift
       }
     })
@@ -445,18 +459,33 @@ class App {
     for (var i = 0; i < steps; i++) {
       const d = Math.random() * duration
 
-      timeline.to(this._preRendering.camera.rotation, d, {
-        z: rotation.z + random(-amplitudeX, amplitudeX),
-        y: rotation.y + random(-amplitudeZ, amplitudeZ)
-      }, time)
+      timeline.to(
+        this._preRendering.camera.rotation,
+        d,
+        {
+          z: rotation.z + random(-amplitudeX, amplitudeX),
+          y: rotation.y + random(-amplitudeZ, amplitudeZ)
+        },
+        time
+      )
 
-      timeline.to(this, d, {
-        _blurAmmount: random(2, 4) * blurStrength
-      }, time)
+      timeline.to(
+        this,
+        d,
+        {
+          _blurAmmount: random(2, 4) * blurStrength
+        },
+        time
+      )
 
-      timeline.to(this, d, {
-        _rgbShiftAmmount: random(200, 500) * rgbShiftStrength
-      }, time)
+      timeline.to(
+        this,
+        d,
+        {
+          _rgbShiftAmmount: random(200, 500) * rgbShiftStrength
+        },
+        time
+      )
 
       time += d
     }
@@ -499,7 +528,7 @@ class App {
     vector.y = -(vector.y - 1) / 2 * height
 
     // normalize
-    vector.x /= width 
+    vector.x /= width
     vector.y /= height
 
     const angle = map(this._biscuit.el.position.x, -1, 1, 20, -20)
@@ -507,7 +536,6 @@ class App {
     TweenMax.delayedCall(0.3, () => {
       this._paper.show(vector.x, vector.y, angle)
     })
-    
   }
 
   private _handlePaperClose() {
@@ -515,8 +543,14 @@ class App {
 
     this._paper.hide()
 
-    TweenMax.delayedCall(0.5, this._paperButton.animateIn.bind(this._paperButton))
-    TweenMax.delayedCall(0.5, this._aboutButton.animateIn.bind(this._aboutButton))
+    TweenMax.delayedCall(
+      0.5,
+      this._paperButton.animateIn.bind(this._paperButton)
+    )
+    TweenMax.delayedCall(
+      0.5,
+      this._aboutButton.animateIn.bind(this._aboutButton)
+    )
 
     TweenMax.to(this, 1, {
       _rgbShiftAmmount: 0
@@ -561,7 +595,10 @@ class App {
     } as any)
 
     this._aboutButton.animateOut(true)
-    TweenMax.delayedCall(0.5, this._closeButton.animateIn.bind(this._closeButton))
+    TweenMax.delayedCall(
+      0.5,
+      this._closeButton.animateIn.bind(this._closeButton)
+    )
 
     this._about.animateIn()
 
@@ -576,7 +613,10 @@ class App {
     this._isAboutOpen = false
 
     if (this._isBiscuitExploded) {
-      TweenMax.delayedCall(0.5, this._paperButton.animateIn.bind(this._paperButton))
+      TweenMax.delayedCall(
+        0.5,
+        this._paperButton.animateIn.bind(this._paperButton)
+      )
     }
 
     this._isAboutOpen = false
@@ -595,7 +635,10 @@ class App {
     } as any)
 
     this._closeButton.animateOut(true)
-    TweenMax.delayedCall(0.5, this._aboutButton.animateIn.bind(this._aboutButton))
+    TweenMax.delayedCall(
+      0.5,
+      this._aboutButton.animateIn.bind(this._aboutButton)
+    )
 
     this._about.animateOut()
 
@@ -648,7 +691,11 @@ class App {
 
       this._renderer.clearDepth()
 
-      this._postRendering.render(this._renderer, this._blurAmmount, this._rgbShiftAmmount)
+      this._postRendering.render(
+        this._renderer,
+        this._blurAmmount,
+        this._rgbShiftAmmount
+      )
 
       this._renderer.clearDepth()
     }

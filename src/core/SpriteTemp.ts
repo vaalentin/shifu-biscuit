@@ -280,7 +280,7 @@
 
 //       if (this.currentAbsoluteFrame >= this.totalAbsoluteFrames - 1) {
 //         if (this.loopsCount !== -1) {
-//           this.currentLoop++;  
+//           this.currentLoop++;
 
 //           if (this.currentLoop === this.loopsCount) {
 //             this.currentAbsoluteFrame = -1;
@@ -319,7 +319,7 @@
 //       this.currentLoop = 0;
 //       this.loopsCount = loopsCount;
 //     }
-    
+
 //     this.isRunning = true;
 //   }
 

@@ -18,10 +18,18 @@ export default class Introduction {
 
   constructor() {
     this._$el = document.querySelector('.introduction') as HTMLElement
-    this._$titles = this._$el.querySelectorAll('.introduction__title') as NodeListOf<HTMLElement>
-    this._$rects = this._$el.querySelectorAll('.title__rect--foreground') as NodeListOf<any>
-    this._$loading = this._$el.querySelector('.introduction__loading') as HTMLElement
-    this._$button = this._$el.querySelector('.introduction__button') as HTMLElement
+    this._$titles = this._$el.querySelectorAll(
+      '.introduction__title'
+    ) as NodeListOf<HTMLElement>
+    this._$rects = this._$el.querySelectorAll(
+      '.title__rect--foreground'
+    ) as NodeListOf<any>
+    this._$loading = this._$el.querySelector(
+      '.introduction__loading'
+    ) as HTMLElement
+    this._$button = this._$el.querySelector(
+      '.introduction__button'
+    ) as HTMLElement
 
     this._scale = 0
 
@@ -48,10 +56,12 @@ export default class Introduction {
   }
 
   private _prepareInstuctions() {
-    const $instructions = this._$el.querySelector('.introduction__instructions') as HTMLElement
+    const $instructions = this._$el.querySelector(
+      '.introduction__instructions'
+    ) as HTMLElement
 
     const words = $instructions.innerText.split(' ')
-    
+
     this._$instructionsLetters = []
 
     $instructions.innerHTML = ''
@@ -134,7 +144,7 @@ export default class Introduction {
     TweenMax.delayedCall(0.2, () => {
       this.onStart.dispatch()
     })
-    
+
     this._isClosing = true
   }
 
@@ -166,11 +176,16 @@ export default class Introduction {
   }
 
   public displayIntro() {
-    TweenMax.staggerTo(this._$instructionsLetters, 1, {
-      opacity: 1,
-      yPercent: '0%',
-      ease: Elastic.easeOut.config(1, 0.5)
-    } as any, 0.015)
+    TweenMax.staggerTo(
+      this._$instructionsLetters,
+      1,
+      {
+        opacity: 1,
+        yPercent: '0%',
+        ease: Elastic.easeOut.config(1, 0.5)
+      } as any,
+      0.015
+    )
 
     TweenMax.to(this._$button, 1, {
       opacity: 1,

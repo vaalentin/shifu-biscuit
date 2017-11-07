@@ -74,7 +74,7 @@ export default class Slicer {
 
     for (let i = 0; i < this._inputPoints.length; i++) {
       this._inputPoints[i] = -10
-    } 
+    }
 
     this._smoothedPoints = new Float32Array(this._settings.pointsCount * 2 * 2)
 
@@ -403,7 +403,7 @@ export default class Slicer {
       return
     }
 
-    const delta = Date.now() - this._lastPointAddedAt 
+    const delta = Date.now() - this._lastPointAddedAt
 
     if (delta > 10) {
       this._stop()

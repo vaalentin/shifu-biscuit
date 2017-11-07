@@ -1,5 +1,4 @@
-
-(function() {
+;(function() {
   // palettes
   var palettes = [
     {
@@ -26,14 +25,14 @@
   var cookies = document.cookie.split(';')
 
   var count
-  
+
   for (var i = 0; i < cookies.length; i++) {
     var cookie = cookies[i].trim()
-    
+
     var parts = cookie.split('=')
     var name = parts[0]
     var value = parts[1]
-    
+
     if (name.trim() === 'count') {
       count = parseInt(value)
     }
@@ -47,11 +46,11 @@
 
   // update count cookie
   var date = new Date()
-  date.setTime(date.getTime() + (30 * 24 * 60 * 60 * 1000))
+  date.setTime(date.getTime() + 30 * 24 * 60 * 60 * 1000)
   expires = date.toUTCString()
 
   document.cookie = 'count=' + ++count + '; expires=' + expires + '; path=/'
-  
+
   // set dom colors
   var background = window.palette.background.hex
   var highlight = window.palette.highlight.hex
@@ -60,8 +59,8 @@
   document.querySelector('.introduction__button').style.background = highlight
 
   var rects = document.querySelectorAll('.title__rect--background')
-  
+
   for (var i = 0; i < rects.length; i++) {
     rects[i].setAttribute('fill', highlight)
-  }  
+  }
 })()

@@ -79,7 +79,9 @@ export default class Sprite {
     this._row = 0
 
     this.material = Sprite._material.clone()
-    this.material.uniforms.texture.value = new THREE.TextureLoader().load(imagegSrc)
+    this.material.uniforms.texture.value = new THREE.TextureLoader().load(
+      imagegSrc
+    )
 
     this._updateUniforms()
   }
@@ -109,10 +111,15 @@ export default class Sprite {
   }
 
   private _updateUniforms() {
-    this.material.uniforms.scale.value.set(1 / this._settings.imagesPerRow, 1 / this._settings.imagesPerColumn)
+    this.material.uniforms.scale.value.set(
+      1 / this._settings.imagesPerRow,
+      1 / this._settings.imagesPerColumn
+    )
     this.material.uniforms.offset.value.set(
       this._column / this._settings.imagesPerColumn,
-      (1 - (this._row / this._settings.imagesPerRow)) - (1/this._settings.imagesPerColumn)
+      1 -
+        this._row / this._settings.imagesPerRow -
+        1 / this._settings.imagesPerColumn
     )
   }
 
@@ -126,7 +133,7 @@ export default class Sprite {
         this._advanceRow()
       }
 
-      this._updateUniforms()  
+      this._updateUniforms()
     }
   }
 }

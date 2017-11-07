@@ -13,13 +13,17 @@ class Sounds {
   private _break: SoundPlayer
 
   private _explode: SoundPlayer
-  
+
   constructor() {
-    this._background = new SoundPlayer([
-      require<string>('../sounds/background.mp3'),
-      require<string>('../sounds/background.ogg'),
-      require<string>('../sounds/background.webm')
-    ], false, true)
+    this._background = new SoundPlayer(
+      [
+        require<string>('../sounds/background.mp3'),
+        require<string>('../sounds/background.ogg'),
+        require<string>('../sounds/background.webm')
+      ],
+      false,
+      true
+    )
 
     this._start = new SoundPlayer([
       require<string>('../sounds/start.mp3'),

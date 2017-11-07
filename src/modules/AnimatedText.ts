@@ -7,7 +7,11 @@ export default class AnimatedText {
 
   private _$letters: HTMLElement[]
 
-  constructor(text: string, links: string[] = [], classes: string[] = [styles.text]) {
+  constructor(
+    text: string,
+    links: string[] = [],
+    classes: string[] = [styles.text]
+  ) {
     this.$el = document.createElement('h2')
 
     for (let i = 0; i < classes.length; i++) {
@@ -45,7 +49,7 @@ export default class AnimatedText {
 
       if (line === '') {
         $currentLine.appendChild($br.cloneNode(true))
-        continue  
+        continue
       }
 
       const words = line.split(' ')
@@ -65,26 +69,25 @@ export default class AnimatedText {
           word = word.replace('{{', '').replace('}}', '')
           $currentWord = $link.cloneNode() as HTMLLinkElement
           $currentWord.setAttribute('href', links.pop())
-        }
-        else {
+        } else {
           $currentWord = $word.cloneNode() as HTMLElement
         }
-  
+
         const letters = word.split('')
-  
+
         for (let k = 0; k < letters.length; k++) {
           const $currentLetter = $letter.cloneNode() as HTMLElement
           $currentLetter.innerText = letters[k]
-  
+
           $currentWord.appendChild($currentLetter)
-  
+
           TweenMax.set($currentLetter, {
             yPercent: '200%'
           })
-  
+
           this._$letters.push($currentLetter)
         }
-  
+
         $currentLine.appendChild($currentWord)
       }
     }
@@ -95,13 +98,18 @@ export default class AnimatedText {
       display: 'block'
     })
 
-    TweenMax.staggerTo(this._$letters, 1, {
-      opacity: 1,
-      yPercent: '0%',
-      ease: Elastic.easeOut.config(1, 0.5)
-    } as any, 0.015)
+    TweenMax.staggerTo(
+      this._$letters,
+      1,
+      {
+        opacity: 1,
+        yPercent: '0%',
+        ease: Elastic.easeOut.config(1, 0.5)
+      } as any,
+      0.015
+    )
   }
-  
+
   public animateOut(hide = false) {
     TweenMax.to(this._$letters, 1, {
       opacity: 0,

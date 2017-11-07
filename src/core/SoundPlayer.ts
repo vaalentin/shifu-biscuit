@@ -54,12 +54,11 @@ export default class SoundPlayer {
             this._audio.setAttribute('src', src)
             this._audio.load()
           })
-        }
-        else {
+        } else {
           this._audio.setAttribute('src', src)
           this._audio.load()
         }
-        
+
         return
       }
     }

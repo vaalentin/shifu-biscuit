@@ -14,7 +14,8 @@ export default class About {
     this.$el.classList.add(styles.about)
     this.$el.style.display = 'none'
 
-    this._text = new AnimatedText(`
+    this._text = new AnimatedText(
+      `
     Why did we do this?
 
     Cause we just wanted to break biscuits and feel smarter at the same time. That’s our way to make the world a better place.
@@ -23,9 +24,9 @@ export default class About {
 
     Music credit:
     Baron Retif & Conception Perez - l’indien”
-    `, [
-      'https://www.facebook.com/jeanvaljeanduweb/'
-    ])
+    `,
+      ['https://www.facebook.com/jeanvaljeanduweb/']
+    )
 
     this._text.$el.classList.add(styles.text)
 
@@ -34,7 +35,7 @@ export default class About {
 
   public animateIn() {
     this.$el.style.display = 'block'
-    
+
     this._text.animateIn()
   }
 

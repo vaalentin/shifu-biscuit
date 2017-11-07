@@ -93,7 +93,6 @@ export default class Confettis {
     depthTest: true
   })
 
-  
   private static _confettisColors = [
     [233, 209, 178],
     [151, 102, 41],
@@ -179,10 +178,7 @@ export default class Confettis {
     this.confettisMaterial = Confettis._confettiMaterial
 
     // confettis
-    this.confettis = new THREE.Points(
-      confettisGeometry,
-      this.confettisMaterial
-    )
+    this.confettis = new THREE.Points(confettisGeometry, this.confettisMaterial)
     this.confettis.visible = false
 
     // shadows arrays

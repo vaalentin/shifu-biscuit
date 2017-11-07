@@ -87,7 +87,9 @@ export default class SlicerMesh {
   public setRandomColor() {
     const value = Math.random()
 
-    let [r, g, b] = window.palette.extras[Math.floor(Math.random() * window.palette.extras.length)].rgb
+    let [r, g, b] = window.palette.extras[
+      Math.floor(Math.random() * window.palette.extras.length)
+    ].rgb
 
     r /= 255
     g /= 255

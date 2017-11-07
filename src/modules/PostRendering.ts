@@ -111,18 +111,21 @@ export default class PostRendering extends AbstratPostRendering {
     this.rgbShiftMaterial.uniforms.resolution.value.set(width, height)
   }
 
-  public render(renderer: THREE.WebGLRenderer, blurAmount: number, rgbShiftAmmount: number) {
-
+  public render(
+    renderer: THREE.WebGLRenderer,
+    blurAmount: number,
+    rgbShiftAmmount: number
+  ) {
     if (blurAmount !== 0) {
       // blur pass
       this._quad.material = this.blurMaterial
-    
+
       // vertical blur
       this.blurMaterial.uniforms.texture.value = this.renderTargets[0].texture
       this.blurMaterial.uniforms.blurAmmount.value.set(blurAmount, 0)
-  
+
       renderer.render(this.scene, this.camera, this.renderTargets[1])
-  
+
       // horizontal blur
       this.blurMaterial.uniforms.texture.value = this.renderTargets[1].texture
       this.blurMaterial.uniforms.blurAmmount.value.set(0, blurAmount)

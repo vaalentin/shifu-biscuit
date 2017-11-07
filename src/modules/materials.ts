@@ -1,9 +1,6 @@
 import * as THREE from 'three'
 
-import {
-  vertexShaderPrecision,
-  fragmentShaderPrecision
-} from '../core/shader'
+import { vertexShaderPrecision, fragmentShaderPrecision } from '../core/shader'
 
 export const vertexColorMaterial = new THREE.RawShaderMaterial({
   vertexShader: `
