@@ -32,7 +32,7 @@ module.exports = {
   entry: path.resolve(__dirname, './src/index.ts'),
   output: {
     path: path.resolve(__dirname, './dist'),
-    filename: 'public/[hash].js'
+    filename: '[hash].js'
   },
   resolve: {
     extensions: ['.ts', '.js']
@@ -85,7 +85,7 @@ module.exports = {
             use: [
               {
                 loader: 'file-loader',
-                options: { name: 'public/[hash].[ext]' }
+                options: { name: '[hash].[ext]' }
               }
             ]
           }
@@ -107,7 +107,7 @@ module.exports = {
             use: [
               {
                 loader: 'file-loader',
-                options: { name: 'public/[hash].[ext]' }
+                options: { name: '[hash].[ext]' }
               }
             ]
           }
@@ -118,7 +118,7 @@ module.exports = {
         use: [
           {
             loader: 'file-loader',
-            options: { name: 'public/[hash].[ext]' }
+            options: { name: '[hash].[ext]' }
           }
         ]
       },
@@ -127,7 +127,7 @@ module.exports = {
         use: [
           {
             loader: 'file-loader',
-            options: { name: 'public/[hash].[ext]' }
+            options: { name: '[hash].[ext]' }
           }
         ]
       }
@@ -147,7 +147,7 @@ module.exports = {
     new webpack.DefinePlugin({
       'process.env': { NODE_ENV: "'production'" }
     }),
-    new ExtractTextPlugin('public/[hash].css'),
+    new ExtractTextPlugin('[hash].css'),
     new webpack.optimize.UglifyJsPlugin({
       compress: {
         drop_console: true
