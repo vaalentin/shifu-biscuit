@@ -21,7 +21,7 @@ const extractCss = ExtractTextPlugin.extract({
       options: {
         importLoaders: 1,
         modules: true,
-        localIdentName: '[local]_[hash:base64:5]'
+        localIdentName: '[hash]'
       }
     },
     postCss
@@ -32,8 +32,7 @@ module.exports = {
   entry: path.resolve(__dirname, './src/index.ts'),
   output: {
     path: path.resolve(__dirname, './dist'),
-    filename: '[hash].js',
-    chunkFilename: '[chunkhash].js'
+    filename: 'public/[hash].js'
   },
   resolve: {
     extensions: ['.ts', '.js']
@@ -78,14 +77,17 @@ module.exports = {
             use: [
               {
                 loader: 'file-loader',
-                options: {
-                  name: '[name].[ext]'
-                }
+                options: { name: '[name].[ext]' }
               }
             ]
           },
           {
-            use: 'file-loader'
+            use: [
+              {
+                loader: 'file-loader',
+                options: { name: 'public/[hash].[ext]' }
+              }
+            ]
           }
         ]
       },
@@ -97,19 +99,38 @@ module.exports = {
             use: [
               {
                 loader: 'file-loader',
-                options: {
-                  name: '[name].[ext]'
-                }
+                options: { name: '[name].[ext]' }
               },
             ]
           },
           {
-            use: 'file-loader'
+            use: [
+              {
+                loader: 'file-loader',
+                options: { name: 'public/[hash].[ext]' }
+              }
+            ]
           }
         ]
       },
-      { test: /\.(mp3|wav|webm|ogg)$/, use: 'file-loader' },
-      { test: /\.(eot|woff2|woff|ttf|svg)$/, use: 'file-loader' }
+      {
+        test: /\.(mp3|wav|webm|ogg)$/,
+        use: [
+          {
+            loader: 'file-loader',
+            options: { name: 'public/[hash].[ext]' }
+          }
+        ]
+      },
+      {
+        test: /\.(eot|woff2|woff|ttf|svg)$/,
+        use: [
+          {
+            loader: 'file-loader',
+            options: { name: 'public/[hash].[ext]' }
+          }
+        ]
+      }
     ]
   },
   plugins: [
@@ -126,7 +147,7 @@ module.exports = {
     new webpack.DefinePlugin({
       'process.env': { NODE_ENV: "'production'" }
     }),
-    new ExtractTextPlugin('[hash].css'),
+    new ExtractTextPlugin('public/[hash].css'),
     new webpack.optimize.UglifyJsPlugin({
       compress: {
         drop_console: true
