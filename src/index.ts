@@ -33,7 +33,7 @@ const SKIP_INTRODUCTION = false
 const PLAY_SOUNDS = true
 const STRAIGHT_TO_PAPER = false
 
-const HITS = random(2, 4, true)
+const HITS = random(2, 5, true)
 const BREAK_HITS = random(1, 3, true)
 
 class App {
