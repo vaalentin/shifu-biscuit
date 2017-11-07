@@ -256,6 +256,7 @@ body {
   letter-spacing: 0.1rem;
   left: 50%;
   transform: translateX(-50%);
+  text-align: center;
 }
 
 .footer__button {
