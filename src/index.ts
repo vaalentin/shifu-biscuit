@@ -7,6 +7,7 @@ import { TweenMax, TimelineMax } from 'gsap'
 import Raycaster from './core/Raycaster'
 import { fileLoader } from './core/Loaders'
 import { map, random } from './core/math'
+import Tracking from './core/Tracking'
 
 import { vertexColorMaterial } from './modules/materials'
 import PreRendering from './modules/PreRendering'
@@ -377,6 +378,12 @@ class App {
           _rgbShiftAmmount: 300
         } as any)
 
+        Tracking.trackEvent({
+          category: 'biscuit',
+          action: 'explode',
+          value: this._hitCount
+        })
+
         this._biscuit.explode(
           this._world,
           this._preRendering.scene,
@@ -574,6 +581,11 @@ class App {
     if (this._isPaperOpen || this._isAboutOpen) {
       return
     }
+
+    Tracking.trackEvent({
+      category: 'about',
+      action: 'click'
+    })
 
     this._isAboutOpen = true
 

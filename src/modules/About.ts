@@ -1,5 +1,7 @@
 import { TweenMax } from 'gsap'
 
+import Tracking from '../core/Tracking'
+
 import * as styles from './About.css'
 
 import AnimatedText from './AnimatedText'
@@ -29,6 +31,13 @@ export default class About {
     )
 
     this._text.$el.classList.add(styles.text)
+
+    this._text.$el.querySelector('a').addEventListener('click', () => {
+      Tracking.trackEvent({
+        category: 'facebook',
+        action: 'click'
+      })
+    })
 
     this.$el.appendChild(this._text.$el)
   }
