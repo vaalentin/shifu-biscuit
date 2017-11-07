@@ -74,4 +74,10 @@ export default class SoundPlayer {
       volume: 0
     } as any)
   }
+
+  public fadeIn(duration: number) {
+    TweenMax.to(this._audio, duration, {
+      volume: 1
+    } as any)
+  }
 }

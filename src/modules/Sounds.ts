@@ -75,8 +75,12 @@ class Sounds {
     this._background.play()
   }
 
-  public stopBackground() {
+  public fadeOutBackground() {
     this._background.fadeOut(1)
+  }
+
+  public fadeInBackground() {
+    this._background.fadeIn(1)
   }
 
   public start() {

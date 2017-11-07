@@ -22,6 +22,8 @@ import Explosion from './modules/Explosion'
 import Slicer from './modules/slicer/Slicer'
 import Sounds from './modules/Sounds'
 import Smoke from './modules/Smoke'
+import About from './modules/About'
+import AnimatedText from './modules/AnimatedText'
 
 require<string>('./images/facebook.png?uncached')
 require<string>('./images/twitter.png?uncached')
@@ -34,8 +36,10 @@ const HITS = random(2, 4, true)
 const BREAK_HITS = random(1, 3, true)
 
 class App {
-  private _world: CANNON.World
+  private _$about: HTMLElement
 
+  private _world: CANNON.World
+  
   private _renderer: THREE.WebGLRenderer
 
   private _preRendering: PreRendering
@@ -53,6 +57,11 @@ class App {
   private _explosion: Explosion
   private _slicer: Slicer
   private _smoke: Smoke
+  private _about: About
+
+  private _paperButton: AnimatedText
+  private _aboutButton: AnimatedText
+  private _closeButton: AnimatedText
 
   private _hitCount: number
 
@@ -60,6 +69,9 @@ class App {
   private _rgbShiftAmmount: number
 
   private _isActive: boolean
+  private _isAboutOpen: boolean
+  private _isPaperOpen: boolean
+  private _isBiscuitExploded: boolean
 
   private _canSlice: boolean
   private _canPlaySliceSound: boolean
@@ -68,6 +80,8 @@ class App {
   private _sliceDirection: THREE.Vector2
 
   constructor() {
+    this._$about = document.querySelector('.footer__link') as HTMLElement
+
     this._world = new CANNON.World()
     this._world.gravity.set(0, -9.82, 0)
     this._world.broadphase = new CANNON.NaiveBroadphase()
@@ -109,7 +123,7 @@ class App {
     this._world.addBody(this._room.rightWallBody)
     this._world.addBody(this._room.backWallBody)
     this._world.addBody(this._room.frontWallBody)
-
+    
     this._biscuit = new Biscuit()
     this._preRendering.scene.add(this._biscuit.el)
     this._preRendering.scene.add(this._biscuit.shadow.el)
@@ -142,12 +156,31 @@ class App {
     this._smoke = new Smoke()
     this._preRendering.scene.add(this._smoke.el)
 
+    this._about = new About()
+    document.body.appendChild(this._about.$el)
+
+    this._paperButton = new AnimatedText('Show me my quote!', [], ['header__button'])
+    TweenMax.set(this._paperButton.$el, { display: 'none' })
+    document.body.appendChild(this._paperButton.$el)
+
+    this._aboutButton = new AnimatedText('About', [], ['footer__button'])
+    TweenMax.set(this._aboutButton.$el, { display: 'none' })
+    document.body.appendChild(this._aboutButton.$el)
+
+    this._closeButton = new AnimatedText('Close', [], ['footer__button'])
+    TweenMax.set(this._closeButton.$el, { display: 'none' })
+    document.body.appendChild(this._closeButton.$el)
+
     this._hitCount = 0
 
     this._blurAmmount = 0
     this._rgbShiftAmmount = 0
 
     this._isActive = false
+    this._isAboutOpen = false
+    this._isPaperOpen = false
+    this._isBiscuitExploded = false
+
     this._canSlice = true
     this._canPlaySliceSound = true
 
@@ -183,6 +216,9 @@ class App {
   }
 
   private _bindMethods() {
+    this._showPaper = this._showPaper.bind(this)
+    this._handleAboutClick = this._handleAboutClick.bind(this)
+    this._handleCloseClick = this._handleCloseClick.bind(this)
     this._update = this._update.bind(this)
     this._handleResize = this._handleResize.bind(this)
     this._handleSliceUpdate = this._handleSliceUpdate.bind(this)
@@ -193,12 +229,15 @@ class App {
   }
 
   private _addListeners() {
+    this._paperButton.$el.addEventListener('click', this._showPaper)
+    this._aboutButton.$el.addEventListener('click', this._handleAboutClick)
+    this._closeButton.$el.addEventListener('click', this._handleCloseClick)
     window.addEventListener('resize', this._handleResize)
     this._slicer.onSliceUpate.add(this._handleSliceUpdate)
     this._slicer.onSliceEnd.add(this._handleSliceEnd)
     this._raycaster.onCast.add(this._handleRaycast)
     THREE.DefaultLoadingManager.onProgress = this._handleLoadProgress
-    this._paper.onClose.add(this._handlePaperClose)
+    this._paper.animatedText.$el.addEventListener('click', this._handlePaperClose)
   }
 
   private _handleLoadProgress(url: number, loaded: number, total: number) {
@@ -324,7 +363,9 @@ class App {
 
         this._explosion.explode(point)
         this._smoke.explode(point)
-        Sounds.stopBackground()
+        Sounds.fadeOutBackground()
+
+        this._isBiscuitExploded = true
         
         TweenMax.to(this, 1, {
           _rgbShiftAmmount: 300
@@ -378,24 +419,12 @@ class App {
     }
   }
 
-  private _handlePaperClose() {
-    this._paper.hide()
-
-    TweenMax.to(this, 1, {
-      _rgbShiftAmmount: 0
-    } as any)
-
-    TweenMax.to(vertexColorMaterial.uniforms.contrast, 0.5, {
-      value: 1
-    } as any)
-
-    TweenMax.to(vertexColorMaterial.uniforms.saturation, 1, {
-      value: 1
-    } as any)
-  }
-
   private _start() {
     this._isActive = true
+
+    TweenMax.delayedCall(1.5, () => {
+      this._aboutButton.animateIn()
+    })
   }
 
   private _shakeCamera(steps: number = 20, amplitudeX = 0.1, amplitudeZ = 0.01, duration = 0.05, endBlur = 0, endRgbShift = 0, blurStrength = 1, rgbShiftStrength = 0.2) {
@@ -434,7 +463,17 @@ class App {
   }
 
   private _showPaper() {
+    if (this._isAboutOpen || this._isPaperOpen) {
+      return
+    }
+
+    this._isPaperOpen = true
+
     const { width, height } = this._renderer.domElement
+
+    this._paperButton.animateOut(true)
+
+    this._aboutButton.animateOut(true)
 
     TweenMax.to(vertexColorMaterial.uniforms.saturation, 1, {
       value: 0.3
@@ -442,6 +481,11 @@ class App {
 
     TweenMax.to(vertexColorMaterial.uniforms.contrast, 1, {
       value: 0.3
+    } as any)
+
+    TweenMax.to(this, 1, {
+      _blurAmmount: 2,
+      _rgbShiftAmmount: 200
     } as any)
 
     Sounds.start()
@@ -464,6 +508,98 @@ class App {
       this._paper.show(vector.x, vector.y, angle)
     })
     
+  }
+
+  private _handlePaperClose() {
+    this._isPaperOpen = false
+
+    this._paper.hide()
+
+    TweenMax.delayedCall(0.5, this._paperButton.animateIn.bind(this._paperButton))
+    TweenMax.delayedCall(0.5, this._aboutButton.animateIn.bind(this._aboutButton))
+
+    TweenMax.to(this, 1, {
+      _rgbShiftAmmount: 0
+    } as any)
+
+    TweenMax.to(vertexColorMaterial.uniforms.contrast, 0.5, {
+      value: 1
+    } as any)
+
+    TweenMax.to(vertexColorMaterial.uniforms.saturation, 1, {
+      value: 1
+    } as any)
+
+    TweenMax.to(this, 1, {
+      _blurAmmount: 0,
+      _rgbShiftAmmount: 0
+    } as any)
+  }
+
+  private _handleAboutClick() {
+    if (this._isPaperOpen || this._isAboutOpen) {
+      return
+    }
+
+    this._isAboutOpen = true
+
+    if (this._isBiscuitExploded) {
+      this._paperButton.animateOut(true)
+    }
+
+    TweenMax.to(vertexColorMaterial.uniforms.saturation, 1, {
+      value: 0.3
+    } as any)
+
+    TweenMax.to(vertexColorMaterial.uniforms.contrast, 1, {
+      value: 0.3
+    } as any)
+
+    TweenMax.to(this, 1, {
+      _blurAmmount: 2,
+      _rgbShiftAmmount: 200
+    } as any)
+
+    this._aboutButton.animateOut(true)
+    TweenMax.delayedCall(0.5, this._closeButton.animateIn.bind(this._closeButton))
+
+    this._about.animateIn()
+
+    Sounds.fadeOutBackground()
+  }
+
+  private _handleCloseClick() {
+    if (!this._isAboutOpen) {
+      return
+    }
+
+    this._isAboutOpen = false
+
+    if (this._isBiscuitExploded) {
+      TweenMax.delayedCall(0.5, this._paperButton.animateIn.bind(this._paperButton))
+    }
+
+    this._isAboutOpen = false
+
+    TweenMax.to(vertexColorMaterial.uniforms.saturation, 1, {
+      value: 1
+    } as any)
+
+    TweenMax.to(vertexColorMaterial.uniforms.contrast, 1, {
+      value: 1
+    } as any)
+
+    TweenMax.to(this, 0.5, {
+      _blurAmmount: 0,
+      _rgbShiftAmmount: 0
+    } as any)
+
+    this._closeButton.animateOut(true)
+    TweenMax.delayedCall(0.5, this._aboutButton.animateIn.bind(this._aboutButton))
+
+    this._about.animateOut()
+
+    Sounds.fadeInBackground()
   }
 
   private _update() {

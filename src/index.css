@@ -202,6 +202,7 @@ body {
 
 .instructions__word {
   white-space: nowrap;
+  display: inline-block;
 }
 
 .instructions__letter {
@@ -240,18 +241,28 @@ body {
   outline: none;
 }
 
-.footer {
+.footer__button,
+.header__button {
+  color: #fff;
+  text-decoration: none;
+  cursor: pointer;
+  font-family: 'Carter One', cursive;
+  font-size: 1rem;
+  font-weight: normal;
+  line-height: 1.2em;
+  cursor: pointer;
   position: absolute;
-  width: 100%;
-  bottom: 0;
-  display: none;
+  letter-spacing: 0.1rem;
+  left: 50%;
+  transform: translateX(-50%);
 }
 
-.footer__link {
-  font-family: 'Tauri', sans-serif;
-  letter-spacing: .2em;
-  text-transform: uppercase;
-  color: #fff;
+.footer__button {
+  bottom: 1rem;
+}
+
+.header__button {
+  top: 1rem;
 }
 
 @media all and (max-width: 800px) and (orientation: landscape) {

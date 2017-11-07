@@ -11,6 +11,19 @@
 
 .word {
   white-space: nowrap;
+  display: inline-block;
+}
+
+.link {
+  color: #fff;
+}
+
+.link .letter {
+  border-bottom: 2px solid #fff;
+}
+
+.link .letter:last-child {
+  letter-spacing: 0;
 }
 
 .letter {

@@ -11,23 +11,19 @@
   top: 0;
   left: 0;
   transform-style: preserve-3d;
-  /* will-change: transform, opacity; */
-  transform-origin: 0 0;
-  backface-visibility: hidden;
+  will-change: transform, opacity;
 }
 
 .container {
   transform: translate(-50%, -50%);
   padding: 2rem;
-  /* will-change: transform, opacity; */
-  /* backface-visibility: hidden; */
+  transform-style: preserve-3d;
 }
 
 .content {
   max-width: 28rem;
   background-color: #fff;
   padding: 1rem;
-  backface-visibility: hidden;
 }
 
 .text {
@@ -49,7 +45,7 @@
 .instructions {
   width: 100%;
   left: 0;
-  bottom: 2rem;
+  bottom: 1rem;
   position: absolute;
   text-align: center;
   font-family: 'Tauri', sans-serif;

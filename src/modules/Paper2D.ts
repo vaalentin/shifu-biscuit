@@ -2,7 +2,6 @@ import * as THREE from 'three'
 import { TweenMax, Elastic, Expo } from 'gsap'
 
 import { random } from '../core/math'
-import Signal from '../core/Signal'
 
 import AnimatedText from './AnimatedText'
 
@@ -22,9 +21,7 @@ export default class Paper2D {
   private _parentSize: THREE.Vector2
   private _position: THREE.Vector2
 
-  private _animatedText: AnimatedText
-
-  public onClose: Signal<void>
+  public animatedText: AnimatedText
 
   constructor(width: number, height: number) {
     this._$el = document.createElement('div')
@@ -52,56 +49,9 @@ export default class Paper2D {
     this._parentSize = new THREE.Vector2(width, height)
     this._position = new THREE.Vector2(0, 0)
 
-    if (true) {
-      this._animatedText = new AnimatedText('Tap anywhere to keep on smashing the biscuit')
-      this._animatedText.$el.classList.add(styles.instructions)
-      this._$el.appendChild(this._animatedText.$el)
-    }
-
-    this.onClose = new Signal<void>()
-
-    // let isMouseDown = false
-
-    // let previousX = 0
-    // let previousY = 0
-
-    // this._$content.addEventListener('mousedown', e => {
-    //   isMouseDown = true
-
-    //   previousX = e.pageX
-    //   previousY = e.pageY
-    // })
-
-    // document.addEventListener('mousemove', e => {
-    //   if (!isMouseDown) {
-    //     return
-    //   }
-
-    //   const x = e.pageX
-    //   const y = e.pageY
-
-    //   const deltaX = (x - previousX) / this._parentSize.width
-    //   const deltaY = (y - previousY) / this._parentSize.height
-
-    //   this._position.x += deltaX
-    //   this._position.y += deltaY
-
-    //   this._needsUpdate = true
-
-    //   previousX = x
-    //   previousY = y
-    // })
-
-    // document.addEventListener('mouseup', () => {
-    //   isMouseDown = false
-
-    //   TweenMax.to(this._position, 1, {
-    //     x: 0.5,
-    //     y: 0.5,
-    //     ease: Elastic.easeOut.config(1, 0.5),
-    //     onUpdate: () => this._needsUpdate = true
-    //   } as any)
-    // })
+    this.animatedText = new AnimatedText('Got it!', [], ['footer__button'])
+    TweenMax.set(this.animatedText.$el, { display: 'none' })
+    this._$el.appendChild(this.animatedText.$el)
   }
 
   public setQuote(quote: { text: string, author: string }) {
@@ -144,6 +94,8 @@ export default class Paper2D {
   public show(originX: number, originY: number, angle: number) {
     this._isActive = true
 
+    TweenMax.delayedCall(0.5, this.animatedText.animateIn.bind(this.animatedText))
+
     document.body.appendChild(this._$el)
 
     this._position.set(originX, originY)
@@ -152,20 +104,7 @@ export default class Paper2D {
       x: 0.5,
       y: 0.5,
       onUpdate: () => this._needsUpdate = true,
-      ease: Elastic.easeOut.config(1, 0.5),
-      onComplete: () => {
-        if (this._animatedText) {
-          this._animatedText.animateIn()
-        }
-
-        this._$el.addEventListener('click', e => {
-          if (e.target !== this._$el) {
-            return
-          }
-
-          this.onClose.dispatch()
-        })
-      }
+      ease: Elastic.easeOut.config(1, 0.5)
     } as any)
 
     TweenMax.set(this._$paper, {
@@ -197,19 +136,19 @@ export default class Paper2D {
 
     this._isClosing = true
 
-    if (this._animatedText) {
-      TweenMax.to(this._animatedText.$el, 0.5, {
-        opacity: 0
-      } as any)
+    if (this.animatedText) {
+      this.animatedText.animateOut(true)
     }
 
     TweenMax.to(this._$paper, 1, {
       css: {
-        scale: 0.7,
         opacity: 0
       },
       ease: Expo.easeOut,
-      onComplete: () => document.body.removeChild(this._$el)
+      onComplete: () => {
+        document.body.removeChild(this._$el)
+        this._isClosing = false
+      }
     } as any)
   }
 }

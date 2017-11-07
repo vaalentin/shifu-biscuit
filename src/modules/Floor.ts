@@ -30,5 +30,7 @@ export default class Floor {
       new THREE.Vector3(1, 0, 0),
       -Math.PI / 2
     )
+
+    this.el.position.y = -0.2
   }
 }
