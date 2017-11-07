@@ -400,7 +400,7 @@ export default class Slicer {
   }
 
   public update() {
-    if (!this._isTouchDown || this._activePointsCount <= 1) {
+    if (!this._isTouchDown || this._activePointsCount <= 2) {
       return
     }
 
