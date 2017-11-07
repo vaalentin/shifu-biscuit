@@ -370,7 +370,6 @@ class App {
 
         this._explosion.explode(point)
         this._smoke.explode(point)
-        Sounds.fadeOutBackground()
 
         this._isBiscuitExploded = true
 
@@ -503,6 +502,8 @@ class App {
       return
     }
 
+    Sounds.fadeOutBackground()
+
     this._isPaperOpen = true
 
     const { width, height } = this._renderer.domElement
@@ -549,6 +550,8 @@ class App {
     this._isPaperOpen = false
 
     this._paper.hide()
+
+    Sounds.fadeInBackground()
 
     TweenMax.delayedCall(
       0.5,

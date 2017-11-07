@@ -80,11 +80,11 @@ class Sounds {
   }
 
   public fadeOutBackground() {
-    this._background.fadeOut(1)
+    this._background.fadeOut(2, 0.2)
   }
 
   public fadeInBackground() {
-    this._background.fadeIn(1)
+    this._background.fadeIn(2, 1)
   }
 
   public start() {
