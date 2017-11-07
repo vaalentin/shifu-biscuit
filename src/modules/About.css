@@ -24,3 +24,11 @@
     line-height: 1rem;
   }
 }
+
+@media (max-width: 500px) {
+  .text {
+    max-width: 400px;
+    font-size: 0.6rem;
+    line-height: 1rem;
+  }
+}

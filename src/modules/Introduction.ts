@@ -203,6 +203,10 @@ export default class Introduction {
     } as any)
   }
 
+  public fallback() {
+    this._$loading.innerHTML = 'Sorry, \n Your browser don\'t supports WebGL. \n try with Chrome'
+  }
+
   public dispose() {
     this._$el.parentNode.removeChild(this._$el)
 

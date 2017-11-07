@@ -275,6 +275,9 @@ export default class Slicer {
   }
 
   private _addPoint(x: number, y: number) {
+    
+    // debugger
+
     if (this._lastPointAdded.x !== null && this._lastPointAdded.y !== null) {
       let dirX = x - this._lastPointAdded.x
       let dirY = y - this._lastPointAdded.y
@@ -406,7 +409,7 @@ export default class Slicer {
 
     const delta = Date.now() - this._lastPointAddedAt
 
-    if (delta > 10) {
+    if (delta > 50) {
       this._stop()
     }
   }

@@ -17,15 +17,16 @@ export default class About {
     this.$el.style.display = 'none'
 
     this._text = new AnimatedText(
-      `
+    `
     Why did we do this?
 
-    Cause we just wanted to break biscuits and feel smarter at the same time. That’s our way to make the world a better place.
+    Cause we just wanted to break biscuits and feel smarter at the same time.
+    That’s our way to make the world a better place.
 
-    If you want to know more head over {{here}}
+    We are {{JeanValJean}}
 
     Music credit:
-    Baron Retif & Conception Perez - l’indien”
+    Baron Retif & Concepcion Perez - l’indien
     `,
       ['https://www.facebook.com/jeanvaljeanduweb/']
     )

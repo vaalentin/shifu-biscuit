@@ -4,6 +4,7 @@ import * as THREE from 'three'
 import * as CANNON from 'cannon'
 import { TweenMax, TimelineMax } from 'gsap'
 
+import Features from './core/Features'
 import Raycaster from './core/Raycaster'
 import { fileLoader } from './core/Loaders'
 import { map, random } from './core/math'
@@ -717,4 +718,10 @@ class App {
   }
 }
 
-new App()
+if (Features.supportsWebGL) {
+  new App()
+}
+else {
+  new Introduction().fallback()
+}
+

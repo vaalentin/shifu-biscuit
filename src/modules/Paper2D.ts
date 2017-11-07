@@ -49,7 +49,7 @@ export default class Paper2D {
     this._parentSize = new THREE.Vector2(width, height)
     this._position = new THREE.Vector2(0, 0)
 
-    this.animatedText = new AnimatedText('Got it!', [], ['footer__button'])
+    this.animatedText = new AnimatedText('Got it, let me keep slashing!', [], ['footer__button'])
     TweenMax.set(this.animatedText.$el, { display: 'none' })
     this._$el.appendChild(this.animatedText.$el)
   }
