@@ -208,8 +208,8 @@ export default class Slicer {
    * 
    */
   private _getRaycastPoints(): number[] | null {
-    if (this._activePointsCount < 2) {
-      return
+    if (this._activePointsCount <= 2) {
+      return []
     }
 
     const rayCastPoints: number[] = []
@@ -399,7 +399,7 @@ export default class Slicer {
   }
 
   public update() {
-    if (!this._isTouchDown || this._activePointsCount <= 2) {
+    if (!this._isTouchDown || this._activePointsCount <= 1) {
       return
     }
 
